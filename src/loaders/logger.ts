@@ -16,7 +16,7 @@ transports.push(
   })
 );
 
-const LoggerInstance = winston.createLogger({
+const Logger = winston.createLogger({
   level: config.get("logging.level"),
   /**
    * Levels:
@@ -42,9 +42,9 @@ const LoggerInstance = winston.createLogger({
   transports,
 });
 
-export default LoggerInstance;
+export default Logger;
 export const HTTPStream = {
   write: (message: string, _encoding: string): void => {
-    LoggerInstance.http(message.trim());
+    Logger.http(message.trim());
   },
 };
