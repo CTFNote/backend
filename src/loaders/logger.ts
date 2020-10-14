@@ -1,4 +1,4 @@
-import * as winston from "winston";
+import winston = require("winston");
 import config from "../config";
 
 const transports = [];
