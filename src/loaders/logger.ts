@@ -43,3 +43,8 @@ const LoggerInstance = winston.createLogger({
 });
 
 export default LoggerInstance;
+export const HTTPStream = {
+  write: (message: string, _encoding: string): void => {
+    LoggerInstance.http(message.trim());
+  },
+};

@@ -2,12 +2,18 @@ import { Application, NextFunction, Request, Response } from "express";
 import { json } from "body-parser";
 import cors = require("cors");
 import { errors as celebrateErrors } from "celebrate";
+import morgan from "morgan";
 
 import { ImATeapotError, NotFoundError } from "../types/httperrors";
-import Logger from "./logger";
+import Logger, { HTTPStream } from "./logger";
 import apiRoutes from "../api";
 
+// @ts-expect-error Some typing is broken i assume
+const morganInstance = morgan("combined", { stream: HTTPStream });
+
 export default (app: Application): void => {
+  app.use(morganInstance);
+
   app.get("/status", (req, res) => {
     res.status(200).send("Ok").end();
     Logger.http("Recieved call to /status");
