@@ -21,6 +21,18 @@ export class BadRequestError extends HTTPError {
   }
 }
 
+export class UnauthorizedError extends HTTPError {
+  constructor(message = "Unauthorized", statusCode = 401) {
+    super(message, statusCode);
+  }
+}
+
+export class ForbiddenError extends HTTPError {
+  constructor(message = "Forbidden", statusCode = 403) {
+    super(message, statusCode);
+  }
+}
+
 export class NotFoundError extends HTTPError {
   constructor(message = "Not Found", statusCode = 404) {
     super(message, statusCode);
