@@ -6,8 +6,8 @@ import Logger from "./logger";
 
 export default async (app: Application): Promise<void> => {
   expressSetup(app);
-  Logger.info("Express initialized");
+  Logger.verbose("Express initialized");
 
   await mongooseSetup();
-  Logger.info("Mongoose initialized");
+  Logger.verbose("Mongoose initialized");
 };
