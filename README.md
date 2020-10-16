@@ -3,27 +3,27 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/CTFNote/server">
+  <a href="https://github.com/CTFNote/backend">
     <img src="https://avatars0.githubusercontent.com/u/72804071?s=200" alt="Logo">
   </a>
 
-  <h3 align="center">CTFNote Server</h3>
+  <h3 align="center">CTFNote Backend</h3>
 
   <p align="center">
     The backend for CTFNote, made using Node.js, express.js, and Typescript.
     <br />
-    <a href="https://github.com/CTFNote/server/wiki"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/CTFNote/backend/wiki"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/CTFNote/server">View Demo</a>
+    <a href="https://github.com/CTFNote/backend">View Demo</a>
     ·
-    <a href="https://github.com/CTFNote/server/issues/new">Report Bug</a>
+    <a href="https://github.com/CTFNote/backend/issues/new">Report Bug</a>
     ·
-    <a href="https://github.com/CTFNote/server/issues/new">Request Feature</a>
+    <a href="https://github.com/CTFNote/backend/issues/new">Request Feature</a>
   </p>
   <div align="center">
-  <a href="https://github.com/CTFNote/server/issues">
-    <img src="https://img.shields.io/github/issues/CTFNote/server.svg"/>
+  <a href="https://github.com/CTFNote/backend/issues">
+    <img src="https://img.shields.io/github/issues/CTFNote/backend.svg"/>
   </a>
   <a href="https://github.com/ent3r/corax-bot-nodejs-rewrite/pulls">
       <img src="https://img.shields.io/github/issues-pr-raw/ent3r/corax-bot-nodejs-rewrite.svg">
@@ -84,7 +84,7 @@ npm install npm@latest -g
 1. Clone the repo
 
 ```sh
-git clone https://github.com/CTFNote/server.git
+git clone https://github.com/CTFNote/backend.git
 ```
 
 2. Install NPM packages
@@ -105,7 +105,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Roadmap
 
-See the [open issues](https://github.com/CTFNote/server/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/CTFNote/backend/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 
