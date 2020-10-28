@@ -1,4 +1,5 @@
 import { model, Document, Schema } from "mongoose";
+
 import { IUserSchema } from "./User";
 
 interface IChallengeSchema {
@@ -19,4 +20,4 @@ interface IChallengeModel extends IChallengeSchema, Document {}
 
 const ChallengeModel = model<IChallengeModel>("Challenge", ChallengeSchema);
 
-export { ChallengeModel, ChallengeSchema, IChallengeModel, IChallengeSchema };
+export { ChallengeSchema, ChallengeModel, IChallengeSchema, IChallengeModel };

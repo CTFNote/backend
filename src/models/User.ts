@@ -1,4 +1,5 @@
 import { model, Document, Schema } from "mongoose";
+
 import { ITeamSchema } from "./Team";
 
 interface IUserSchema {

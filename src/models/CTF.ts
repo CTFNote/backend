@@ -1,4 +1,5 @@
 import { model, Document, Schema } from "mongoose";
+
 import { IChallengeModel } from "./Challenge";
 import { IUserSchema } from "./User";
 
