@@ -1,15 +1,16 @@
 import { model, Document, Schema } from "mongoose";
+import { ITeamSchema } from "./Team";
 
 interface IUserSchema {
   username: string;
   password: string;
-  teams: Array<undefined>; // To be added when teams are created
+  teams: Array<ITeamSchema>;
 }
 
 const UserSchema = new Schema<IUserSchema>({
   username: String,
   password: String,
-  teams: [undefined], // To be added when teams are created
+  teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
 });
 
 interface IUserModel extends IUserSchema, Document {}
