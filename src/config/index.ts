@@ -19,11 +19,18 @@ const config = convict({
     arg: "host",
   },
   port: {
-    doc: "The port to bind.",
+    doc: "What port to use for http",
     format: "port",
     default: 8080,
     env: "PORT",
     arg: "port",
+  },
+  httpsPort: {
+    doc: "What port to use for https",
+    format: "port",
+    default: 8443,
+    env: "HTTP_PORT",
+    arg: "httpsPort",
   },
   db: {
     host: {
@@ -56,14 +63,18 @@ if (config.get("env") === "production") {
     config.loadFile(`.env.test.json`);
     config.validate({ allowed: "strict" });
   } else {
-    console.warn("\x1b[41m⚠️ Test config missing, using default values ⚠️\x1b[0m");
+    console.warn(
+      "\x1b[41m⚠️ Test config missing, using default values ⚠️\x1b[0m"
+    );
   }
 } else if (config.get("env") === "development") {
   if (existsSync("./.env.development.json")) {
     config.loadFile(`.env.development.json`);
     config.validate({ allowed: "strict" });
   } else {
-    console.warn("\x1b[41m⚠️ Development config missing, using default values ⚠️\x1b[0m");
+    console.warn(
+      "\x1b[41m⚠️ Development config missing, using default values ⚠️\x1b[0m"
+    );
   }
 }
 
