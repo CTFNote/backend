@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { ImATeapotError, NotFoundError } from "../types/httperrors";
 import Logger, { HTTPStream } from "./logger";
 import apiRoutes from "../api";
+import config from "../config";
 
 // @ts-expect-error Some typing is broken i assume
 const morganInstance = morgan("combined", { stream: HTTPStream });
@@ -35,7 +36,7 @@ export default (app: Application): void => {
   app.use(json());
   Logger.debug("JSON middleware added");
 
-  app.use(cors());
+  app.use(cors({ origin: config.get("cors") }));
   Logger.debug("CORS middleware added");
 
   app.disable("x-powered-by");

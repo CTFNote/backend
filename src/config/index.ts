@@ -32,6 +32,11 @@ const config = convict({
     env: "HTTP_PORT",
     arg: "httpsPort",
   },
+  cors: {
+    doc: "What origins are allowed to connect to the backend",
+    format: Array,
+    default: ["0.0.0.0/0"],
+  },
   db: {
     host: {
       doc: "Database host name/IP and port",
