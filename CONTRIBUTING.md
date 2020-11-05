@@ -27,7 +27,36 @@ The following are the guidelines we request you to follow in order to contribute
 
 ### Commit Messages
 
-This project follows the [gitmoji][gitmoji-url] commit message system. Along with that, commit titles should be in the imperative present tense form (see [this][commit-message-guidelines]). The [gitmoji-cli][gitmoji-cli] can be a useful tool to install.
+This project follows the [Conventional Commits][conventional] and [`@commitlint/conventional-commit`][commitlint-conventional] convention. All git commits get linted using [`@commitlint/cli`][commitlintcli]. Along with that, commit titles should be in the imperative present tense form.
+
+Examples of valid commit messages:
+
+- ```txt
+  fix(parser): fix URL parser
+  ```
+
+- ```txt
+  refactor(api): add route for registering
+
+  BREAKING CHANGE: Route no longer resides at `/api/users/register`, moved to `/api/auth/register`
+
+  Moved for consistency between everything auth related
+
+  See #4
+  See #10
+  ```
+
+Examples of invalid commit messages:
+
+- ```txt
+  remove some stuff
+  ```
+
+- ```txt
+  fix a bug
+
+  some stuff wasnt working so i fixed it
+  ```
 
 ### Issues
 
@@ -71,5 +100,6 @@ Make sure to document the contributions well in the pull request.
 > It is not compulsory to follow the guidelines mentioned above, but it is strongly recommended.
 
 [commit-message-guidelines]: https://github.com/trein/dev-best-practices/wiki/Git-Commit-Best-Practices#write-good-commit-messages
-[gitmoji-url]: https://gitmoji.carloscuesta.me/
-[gitmoji-cli]: https://github.com/carloscuesta/gitmoji-cli
+[commitlint-conventional]: https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional
+[conventional]: https://www.conventionalcommits.org/en/v1.0.0/
+[commitlintcli]: https://commitlint.js.org/
