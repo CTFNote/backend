@@ -16,7 +16,7 @@ The following is a set of guidelines for contributing. These are mostly guidelin
     - [Issues](#issues)
     - [Code Styleguide](#code-styleguide)
     - [Pull Requests](#pull-requests)
-  - [What should I know before I get started](#what-should-i-know-before-i-get-started)
+  - [What should I know before I get started (TODO)](#what-should-i-know-before-i-get-started-todo)
   - [How Can I Contribute](#how-can-i-contribute)
 
 # Guidelines
@@ -60,13 +60,13 @@ Examples of invalid commit messages:
 
 ### Issues
 
-For issues, please use one of the available templates.
+For issues, please use one of the available templates. If none of the templates fit, create an issue without following a template, but include as much information as possible.
 
 ### Code Styleguide
 
 The code should satisfy the following:
 
-- Have meaningful variable names, either in `snake_case` or `camelCase`.
+- Have meaningful variable names in `camelCase` format.
 - Have no issues when running `yarn run lint`.
 - Have a scope for easy fixing, refactoring and scaling.
 - If applicable, have meaningful file names, directory names and directory structure.
@@ -78,7 +78,7 @@ Pull requests should have:
 - A concise commit message.
 - A description of what was changed/added.
 
-## What should I know before I get started
+## What should I know before I get started (TODO)
 
 You can contribute to any of the features you want, here's what you need to know:
 

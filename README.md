@@ -61,6 +61,7 @@
 - [Typescript](https://www.typescriptlang.org)
 - [Node.js](https://nodejs.org)
 - [Express.js](https://expressjs.com)
+- [MongoDB](https://mongodb.com) ([Mongoose](https://mongoosejs.com))
 - [Yarn](https://yarnpkg.com)
 
 <!-- GETTING STARTED -->
@@ -73,10 +74,10 @@ To get a local copy up and running follow these simple steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 
-- npm
+- yarn
 
 ```sh
-npm install npm@latest -g
+npm install yarn@latest -g
 ```
 
 ### Installation
@@ -115,7 +116,7 @@ Contributions are what make the open source community such an amazing place to b
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feat: add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
