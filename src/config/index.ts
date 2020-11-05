@@ -1,6 +1,7 @@
 import convict from "convict";
 import { ipaddress } from "convict-format-with-validator";
 import { existsSync } from "fs";
+import { resolve } from "path";
 
 convict.addFormat(ipaddress);
 
@@ -64,8 +65,8 @@ const config = convict({
 if (config.get("env") === "production") {
   config.validate({ allowed: "strict" });
 } else if (config.get("env") === "test") {
-  if (existsSync("./.env.test.json")) {
-    config.loadFile(`.env.test.json`);
+  if (existsSync(resolve(__dirname, "./.env.test.json"))) {
+    config.loadFile(resolve(__dirname, "./.env.test.json"));
     config.validate({ allowed: "strict" });
   } else {
     console.warn(
@@ -73,8 +74,8 @@ if (config.get("env") === "production") {
     );
   }
 } else if (config.get("env") === "development") {
-  if (existsSync("./.env.development.json")) {
-    config.loadFile(`.env.development.json`);
+  if (existsSync(resolve(__dirname, "./.env.development.json"))) {
+    config.loadFile(resolve(__dirname, "./.env.development.json"));
     config.validate({ allowed: "strict" });
   } else {
     console.warn(
