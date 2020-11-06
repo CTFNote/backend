@@ -8,6 +8,7 @@ import { ImATeapotError, NotFoundError } from "../types/httperrors";
 import Logger, { HTTPStream } from "./logger";
 import apiRoutes from "../api";
 import config from "../config";
+import { ErrorResponse } from "../types";
 
 // @ts-expect-error Some typing is broken i assume
 const morganInstance = morgan("combined", { stream: HTTPStream });
@@ -28,7 +29,13 @@ export default (app: Application): void => {
   app.all(
     "/teapot",
     (req: Request, res: Response, next: NextFunction): void => {
-      next(new ImATeapotError());
+      next(
+        new ImATeapotError({
+          errorCode: "error_teapot",
+          details:
+            'Any attempt to brew coffee with a teapot should result in the error code "418 I\'m a teapot". The resulting entity body MAY be short and stout.',
+        })
+      );
     }
   );
   Logger.debug("Loaded /teapot route");
@@ -56,7 +63,10 @@ export default (app: Application): void => {
   app.use(
     (err: any, req: Request, res: Response, _next: NextFunction): void => {
       res.status(err.statusCode || 500);
-      res.send({ errors: { message: err.message } });
+      const response: ErrorResponse = { errors: { message: err.message } };
+      if (err.details) response.errors.details = err.details;
+      if (err.errorCode) response.errors.errorCode = err.errorCode;
+      res.send(response);
     }
   );
   Logger.debug("Error handler added");
