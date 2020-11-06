@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: "."
+      dockerfile: "./Dockerfile"
+    ports:
+      - "80:80"
+      - "443:443"
+
+    env_file:
+      - .env
