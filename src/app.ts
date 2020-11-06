@@ -14,14 +14,16 @@ const port = config.get("port");
 const httpsPort = config.get("httpsPort");
 const host = config.get("host");
 
-const httpsConfig: https.ServerOptions = {
-  key: readFileSync(resolve(__dirname, "ssl/key.pem")),
-  cert: readFileSync(resolve(__dirname, "ssl/cert.pem")),
-};
+let httpsConfig: https.ServerOptions;
 
+if (config.get("httpsEnabled")) {
+  httpsConfig = {
+    key: readFileSync(resolve(__dirname, "ssl/key.pem")),
+    cert: readFileSync(resolve(__dirname, "ssl/cert.pem")),
+  };
+}
 loaders(app).then((): void => {
   const httpServer = http.createServer(app);
-  const httpsServer = https.createServer(httpsConfig, app);
 
   httpServer
     .listen(port, host)
@@ -33,13 +35,18 @@ loaders(app).then((): void => {
       process.exit(1);
     });
 
-  httpsServer
-    .listen(httpsPort, host)
-    .on("listening", () => {
-      Logger.warn(`HTTPS listening on ${host}:${httpsPort}`);
-    })
-    .on("error", (err) => {
-      Logger.error(err);
-      process.exit(1);
-    });
+  if (config.get("httpsEnabled")) {
+    https
+      .createServer(httpsConfig, app)
+      .listen(httpsPort, host)
+      .on("listening", () => {
+        Logger.warn(`HTTPS listening on ${host}:${httpsPort}`);
+      })
+      .on("error", (err) => {
+        Logger.error(err);
+        process.exit(1);
+      });
+  } else {
+    Logger.warn("HTTPS not enabled");
+  }
 });

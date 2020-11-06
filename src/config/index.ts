@@ -33,6 +33,12 @@ const config = convict({
     env: "HTTP_PORT",
     arg: "httpsPort",
   },
+  httpsEnabled: {
+    doc: "Whether or not HTTPS should be enabled (for example when running in a docker container)",
+    format: Boolean,
+    default: true,
+    env: "HTTPS_ENABLED"
+  },
   cors: {
     doc: "What origins are allowed to connect to the backend",
     format: Array,
