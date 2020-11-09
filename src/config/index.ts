@@ -66,6 +66,26 @@ const config = convict({
       env: "LOGGING_LEVEL",
     },
   },
+  jwt: {
+    secret: {
+      doc: "The JWT secret",
+      format: String,
+      env: "JWT_SECRET",
+      default: "",
+    },
+    refreshToken: {
+      doc: "A refresh token for refreshing JWTs? idk",
+      format: String,
+      env: "JWT_REFRESH",
+      default: "",
+    },
+  },
+  saltRounds: {
+    doc: "How many times bcrypt will go over the password before returning it",
+    format: Number,
+    default: 10,
+    env: "JWT_ROUNDS"
+  }
 });
 
 if (config.get("env") === "production") {
