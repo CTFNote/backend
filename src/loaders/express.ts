@@ -3,6 +3,7 @@ import { json } from "body-parser";
 import cors = require("cors");
 import { errors as celebrateErrors } from "celebrate";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import { ImATeapotError, NotFoundError } from "../types/httperrors";
 import Logger, { HTTPStream } from "./logger";
@@ -42,6 +43,9 @@ export default (app: Application): void => {
 
   app.use(json());
   Logger.debug("JSON middleware added");
+
+  app.use(cookieParser());
+  Logger.debug("Cookie parser added");
 
   app.use(cors({ origin: config.get("cors") }));
   Logger.debug("CORS middleware added");
