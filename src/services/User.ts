@@ -33,8 +33,7 @@ export default class UserService {
     password: string,
     ipAddress: string
   ): Promise<{
-    id: mongoose.Types.ObjectId;
-    username: string;
+    user: { id: mongoose.Types.ObjectId; username: string };
     jwtToken: string;
     refreshToken: string;
   }> {
@@ -55,7 +54,7 @@ export default class UserService {
           teams: [],
         }).save();
         return {
-          ...this.basicDetails(newUser),
+          user: this.basicDetails(newUser),
           ...(await this.generateTokens(newUser, ipAddress)),
         };
       })
