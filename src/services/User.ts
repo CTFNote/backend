@@ -79,8 +79,7 @@ export default class UserService {
     password: string,
     ipAddress: string
   ): Promise<{
-    id: mongoose.Types.ObjectId;
-    username: string;
+    user: { id: mongoose.Types.ObjectId; username: string };
     jwtToken: string;
     refreshToken: string;
   }> {
@@ -93,7 +92,7 @@ export default class UserService {
       });
 
     return {
-      ...this.basicDetails(user),
+      user: this.basicDetails(user),
       ...(await this.generateTokens(user, ipAddress)),
     };
   }
