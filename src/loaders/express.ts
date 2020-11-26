@@ -47,7 +47,7 @@ export default (app: Application): void => {
   app.use(cookieParser());
   Logger.debug("Cookie parser added");
 
-  app.use(cors({ origin: config.get("cors") }));
+  app.use(cors(/*{ origin: config.get("cors") }*/)); // TODO: Fix CORS config using config file
   Logger.debug("CORS middleware added");
 
   app.disable("x-powered-by");
