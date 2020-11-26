@@ -41,7 +41,7 @@ const config = convict({
   },
   cors: {
     doc: "What origins are allowed to connect to the backend",
-    format: Array,
+    format: "*",
     default: ["0.0.0.0/0"],
   },
   db: {
