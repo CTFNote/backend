@@ -37,8 +37,8 @@ async function login(req: Request, res: Response, next: NextFunction) {
 
 async function logout(req: Request, res: Response, next: NextFunction) {
   await userService
-    .revokeToken(req.cookies.refreshToken, req.ip)
-    .then((_) => {
+    .logoutUser(req.cookies.refreshToken, req.ip, res)
+    .then(() => {
       res.status(204).send();
     })
     .catch((err) => next(err));

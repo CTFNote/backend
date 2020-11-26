@@ -98,6 +98,20 @@ export default class UserService {
   }
 
   /**
+   * logs out a user by revoking refresh tokens and unsetting cookies
+   *
+   * @param {string} token the refresh token used when logging out
+   * @param {string} ip what ip is logging out
+   * @param {Response} res the response object in order to remove the cookie
+   * @returns {Promise<void>}
+   * @memberof UserService
+   */
+  public async logoutUser(token: string, ip: string, res: Response): Promise<void> {
+    this.revokeToken(token, ip);
+    res.clearCookie("refreshToken");
+  }
+
+  /**
    * generates the JWT and refresh tokens that will be returned to the user
    *
    * @private
