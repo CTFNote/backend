@@ -107,7 +107,12 @@ export default class UserService {
    */
   public async logoutUser(token: string, ip: string, res: Response): Promise<void> {
     this.revokeToken(token, ip);
-    res.clearCookie("refreshToken");
+    const options: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    };
+    res.clearCookie("refreshToken", options);
   }
 
   /**
@@ -272,6 +277,7 @@ export default class UserService {
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
+      sameSite: "strict",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days to hours => minutes => seconds => miliseconds
     };
     res.cookie("refreshToken", token, cookieOptions);
