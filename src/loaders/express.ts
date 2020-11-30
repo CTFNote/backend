@@ -49,7 +49,7 @@ export default (app: Application): void => {
   Logger.debug("CORS middleware added");
 
   app.disable("x-powered-by");
-  Logger.debug('Disabled "x-powered-by"');
+  Logger.debug('Disabled "X-Powered-By"');
 
   app.use("/api", apiRoutes());
   Logger.debug("API routes loaded");
