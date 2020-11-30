@@ -15,6 +15,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
+import { AuthenticatedUserData, BasicUserDetails, TokenData } from "../types";
 
 const saltRounds = config.get("saltRounds");
 
@@ -32,11 +33,7 @@ export default class UserService {
     username: string,
     password: string,
     ipAddress: string
-  ): Promise<{
-    user: { id: mongoose.Types.ObjectId; username: string };
-    jwtToken: string;
-    refreshToken: string;
-  }> {
+  ): Promise<AuthenticatedUserData> {
     const userAlreadyExists = await UserModel.findOne({
       username: username.toLowerCase(),
     }).then();
@@ -77,11 +74,7 @@ export default class UserService {
     username: string,
     password: string,
     ipAddress: string
-  ): Promise<{
-    user: { id: mongoose.Types.ObjectId; username: string };
-    jwtToken: string;
-    refreshToken: string;
-  }> {
+  ): Promise<AuthenticatedUserData> {
     const user = await UserModel.findOne({ username: username.toLowerCase() });
 
     if (!user || !(await bcrypt.compare(password, user.password)))
@@ -124,7 +117,7 @@ export default class UserService {
    * @returns the jwt and refresh tokens
    * @memberof UserService
    */
-  private async generateTokens(user: IUserModel, ipAddress: string) {
+  private async generateTokens(user: IUserModel, ipAddress: string): Promise<TokenData> {
     const jwtToken = this.generateAccesstoken(user);
     const refreshToken = this.generateRefreshtoken(user, ipAddress);
 
@@ -145,7 +138,7 @@ export default class UserService {
    */
   public async getBasicUser(
     id: mongoose.Types.ObjectId
-  ): Promise<{ id: string; username: string }> {
+  ): Promise<BasicUserDetails> {
     return this.basicDetails(await this.getFullUser(id));
   }
 
@@ -176,12 +169,7 @@ export default class UserService {
   public async refreshRefreshToken(
     token: string,
     ipAddress: string
-  ): Promise<{
-    id: mongoose.Types.ObjectId;
-    username: string;
-    jwtToken: string;
-    refreshToken: string;
-  }> {
+  ): Promise<AuthenticatedUserData> {
     const refreshToken = (await this.getRefreshToken(token)).populate("User");
     const user = await this.getFullUser(refreshToken.user._id);
 
@@ -192,7 +180,7 @@ export default class UserService {
     const jwtToken = this.generateAccesstoken(user);
 
     return {
-      ...this.basicDetails(user),
+      user: this.basicDetails(user),
       jwtToken,
       refreshToken: newRefreshToken.token,
     };
@@ -288,10 +276,10 @@ export default class UserService {
    *
    * @private
    * @param {IUserModel} user the user that is used
-   * @returns {{id: mongoose.Types.ObjectId, username: string}} the user details with all sensitive details stripped
+   * @returns {BasicUserDetails} the user details with all sensitive details stripped
    * @memberof UserService
    */
-  private basicDetails(user: IUserModel) {
+  private basicDetails(user: IUserModel): BasicUserDetails {
     const { id, username } = user;
     return { id, username };
   }
