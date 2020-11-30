@@ -19,11 +19,9 @@ export default (app: Application): void => {
 
   app.get("/status", (req, res) => {
     res.status(200).send("Ok").end();
-    Logger.http("Recieved call to /status");
   });
   app.head("/status", (req, res) => {
     res.status(200).send("Ok").end();
-    Logger.http("Recieved call to /status");
   });
   Logger.debug("Loaded /status routes");
 
