@@ -91,7 +91,7 @@ export class ConflictError extends HTTPError {
 
 export class ImATeapotError extends HTTPError {
   constructor({
-    message = "I'm A Teapot",
+    message = "I'm a teapot",
     statusCode = 418,
     details = undefined,
     errorCode = undefined,
