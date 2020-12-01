@@ -1,16 +1,40 @@
+import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
 import UserService from "../../services/user";
 
 const userService = new UserService();
 
+const verifyCredentials = celebrate({
+  [Segments.BODY]: Joi.object({
+    username: Joi.string().min(3).required(),
+    password: Joi.string().min(8).required(),
+  }),
+});
+
 export default (): Router => {
   const router = Router();
 
-  router.post("/register", register);
-  router.post("/login", login);
-  router.post("/logout", logout);
-  router.post("/refresh-token", refreshToken);
+  router.post("/register", verifyCredentials, register);
+  router.post("/login", verifyCredentials, login);
+  router.post(
+    "/logout",
+    celebrate({
+      [Segments.COOKIES]: Joi.object({
+        refreshToken: Joi.string().length(128),
+      }),
+    }),
+    logout
+  );
+  router.post(
+    "/refresh-token",
+    celebrate({
+      [Segments.COOKIES]: Joi.object({
+        refreshToken: Joi.string().length(128).required(),
+      }),
+    }),
+    refreshToken
+  );
 
   return router;
 };
