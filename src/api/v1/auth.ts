@@ -5,18 +5,25 @@ import UserService from "../../services/user";
 
 const userService = new UserService();
 
-const verifyCredentials = celebrate({
+const newUserVerification = celebrate({
+  [Segments.BODY]: Joi.object({
+    username: Joi.string().min(3).regex(/^([a-zA-Z0-9_.]|[^\s])+$/).required(),
+    password: Joi.string().min(8).regex(/^(?=(?:.*[A-Z]){1,})(?=.*[!@#$&*]{1,})(?=(?:.*[0-9]){1,})(?=(?:.*[a-z]){1,}).{8,}$/).required(),
+  }),
+});
+
+const verifyLoginCreds = celebrate({
   [Segments.BODY]: Joi.object({
     username: Joi.string().min(3).required(),
-    password: Joi.string().min(8).required(),
-  }),
+    password: Joi.string().min(8).required()
+  })
 });
 
 export default (): Router => {
   const router = Router();
 
-  router.post("/register", verifyCredentials, register);
-  router.post("/login", verifyCredentials, login);
+  router.post("/register", newUserVerification, register);
+  router.post("/login", verifyLoginCreds, login);
   router.post(
     "/logout",
     celebrate({
