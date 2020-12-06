@@ -19,7 +19,7 @@ import { AuthenticatedUserData, BasicUserDetails, TokenData } from "../types";
 
 const saltRounds = config.get("saltRounds");
 
-export default class UserService {
+export default class AuthService {
   /**
    * registers a new user to the database
    *
@@ -27,7 +27,7 @@ export default class UserService {
    * @param {string} password the password the user will use
    * @param {string} ipAddress the ip address used to register the user
    * @returns {object} an object containing the user details, access token and refresh token
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async registerUser(
     username: string,
@@ -69,7 +69,7 @@ export default class UserService {
    * @param {string} password password for logging in
    * @param {string} ipAddress ip address of the user logging in
    * @returns {object} an object containing the user details, access token and refresh token
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async authenticateUser(
     username: string,
@@ -97,7 +97,7 @@ export default class UserService {
    * @param {string} ip what ip is logging out
    * @param {Response} res the response object in order to remove the cookie
    * @returns {Promise<void>}
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async logoutUser(token: string, ip: string, res: Response): Promise<void> {
     this.revokeToken(token, ip);
@@ -116,7 +116,7 @@ export default class UserService {
    * @param {IUserModel} user what user the tokens should be generated for
    * @param {string} ipAddress what ip address is used to generate the tokens
    * @returns the jwt and refresh tokens
-   * @memberof UserService
+   * @memberof AuthService
    */
   private async generateTokens(user: IUserModel, ipAddress: string): Promise<TokenData> {
     const jwtToken = this.generateAccesstoken(user);
@@ -135,7 +135,7 @@ export default class UserService {
    *
    * @param {mongoose.Types.ObjectId} id the id of the user to find details on
    * @returns basic details of a user
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async getBasicUser(
     id: mongoose.Types.ObjectId
@@ -148,7 +148,7 @@ export default class UserService {
    *
    * @param {mongoose.Types.ObjectId} id the id of the user to find details on
    * @returns {Promise<IUserModel>} the whole document on the user
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async getFullUser(id: mongoose.Types.ObjectId): Promise<IUserModel> {
     if (!isValidObjectId(id))
@@ -165,7 +165,7 @@ export default class UserService {
    * @param {string} token the token to revoke
    * @param {string} ipAddress the ip adress that is refreshing the token
    * @returns user details along with a JWT and the new refresh token
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async refreshRefreshToken(
     token: string,
@@ -192,7 +192,7 @@ export default class UserService {
    *
    * @param {IUserModel} user what user the access token is for
    * @returns {string} the JWT
-   * @memberof UserService
+   * @memberof AuthService
    */
   public generateAccesstoken(user: IUserModel): string {
     return jwt.sign({ sub: user._id, id: user._id }, config.get("jwt.secret"), {
@@ -205,7 +205,7 @@ export default class UserService {
    *
    * @param {string} token the token to find in the database
    * @returns {Promise<IRefreshTokenModel>} the token document
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async getRefreshToken(token: string): Promise<IRefreshTokenModel> {
     const refreshToken = await RefreshToken.findOne({ token }).then();
@@ -220,7 +220,7 @@ export default class UserService {
    *
    * @param {IUserModel} user what user the refresh token is for
    * @param {string} ipAddress what ip address is generating the new refresh token
-   * @memberof UserService
+   * @memberof AuthService
    */
   public generateRefreshtoken(
     user: IUserModel,
@@ -240,7 +240,7 @@ export default class UserService {
    * @param {string} token what token to make invalid
    * @param {string} ipAddress what ip address is revoking the token
    * @param {string} [replacedByToken] an optional parameter that indicates what token replaces this one
-   * @memberof UserService
+   * @memberof AuthService
    */
   public async revokeToken(
     token: string,
@@ -260,7 +260,7 @@ export default class UserService {
    *
    * @param {Response} res the response object, used for setting the cookie
    * @param {string} token the token to be set as the refresh token
-   * @memberof UserService
+   * @memberof AuthService
    */
   public setRefreshTokenCookie(res: Response, token: string): void {
     const cookieOptions: CookieOptions = {
@@ -278,7 +278,7 @@ export default class UserService {
    * @private
    * @param {IUserModel} user the user that is used
    * @returns {BasicUserDetails} the user details with all sensitive details stripped
-   * @memberof UserService
+   * @memberof AuthService
    */
   private basicDetails(user: IUserModel): BasicUserDetails {
     const { id, usernameCapitalization } = user;

@@ -1,9 +1,9 @@
 import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
-import UserService from "../../services/user";
+import AuthService from "../../services/Auth";
 
-const userService = new UserService();
+const authService = new AuthService();
 
 const newUserVerification = celebrate({
   [Segments.BODY]: Joi.object({
@@ -47,27 +47,27 @@ export default (): Router => {
 };
 
 async function register(req: Request, res: Response, next: NextFunction) {
-  await userService
+  await authService
     .registerUser(req.body.username, req.body.password, req.ip)
     .then(({ refreshToken, ...user }) => {
-      userService.setRefreshTokenCookie(res, refreshToken);
+      authService.setRefreshTokenCookie(res, refreshToken);
       res.status(201).send(user);
     })
     .catch((err) => next(err));
 }
 
 async function login(req: Request, res: Response, next: NextFunction) {
-  await userService
+  await authService
     .authenticateUser(req.body.username, req.body.password, req.ip)
     .then(({ refreshToken, ...user }) => {
-      userService.setRefreshTokenCookie(res, refreshToken);
+      authService.setRefreshTokenCookie(res, refreshToken);
       res.status(200).send(user);
     })
     .catch((err) => next(err));
 }
 
 async function logout(req: Request, res: Response, next: NextFunction) {
-  await userService
+  await authService
     .logoutUser(req.cookies.refreshToken, req.ip, res)
     .then(() => {
       res.status(204).send();
@@ -76,10 +76,10 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 }
 
 async function refreshToken(req: Request, res: Response, next: NextFunction) {
-  await userService
+  await authService
     .refreshRefreshToken(req.cookies.refreshToken, req.ip)
     .then(({ refreshToken, ...user }) => {
-      userService.setRefreshTokenCookie(res, refreshToken);
+      authService.setRefreshTokenCookie(res, refreshToken);
       res.status(200).send(user);
     })
     .catch((err) => next(err));
