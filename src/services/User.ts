@@ -46,6 +46,7 @@ export default class UserService {
       .then(async (hash) => {
         Logger.silly("Saving new user to the DB");
         const newUser = await new UserModel({
+          usernameCapitalization: username,
           username: username.toLowerCase(),
           password: hash,
           teams: [],
@@ -280,7 +281,7 @@ export default class UserService {
    * @memberof UserService
    */
   private basicDetails(user: IUserModel): BasicUserDetails {
-    const { id, username } = user;
-    return { id, username };
+    const { id, usernameCapitalization } = user;
+    return { id, usernameCapitalization };
   }
 }

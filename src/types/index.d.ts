@@ -25,7 +25,7 @@ export interface ErrorResponse {
 // User data that doesn't contain any sensitive information
 export interface BasicUserDetails {
   id: mongooseTypes.ObjectId;
-  username: string;
+  usernameCapitalization: string;
 }
 
 export interface TokenData {
