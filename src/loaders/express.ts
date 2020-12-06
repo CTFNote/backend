@@ -3,6 +3,7 @@ import { json } from "body-parser";
 import cors = require("cors");
 import { errors as celebrateErrors } from "celebrate";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import { ImATeapotError, NotFoundError } from "../types/httperrors";
 import Logger, { HTTPStream } from "./logger";
@@ -18,11 +19,9 @@ export default (app: Application): void => {
 
   app.get("/status", (req, res) => {
     res.status(200).send("Ok").end();
-    Logger.http("Recieved call to /status");
   });
   app.head("/status", (req, res) => {
     res.status(200).send("Ok").end();
-    Logger.http("Recieved call to /status");
   });
   Logger.debug("Loaded /status routes");
 
@@ -43,11 +42,14 @@ export default (app: Application): void => {
   app.use(json());
   Logger.debug("JSON middleware added");
 
-  app.use(cors({ origin: config.get("cors") }));
+  app.use(cookieParser());
+  Logger.debug("Cookie parser added");
+
+  app.use(cors({ origin: config.get("cors"), credentials: true }));
   Logger.debug("CORS middleware added");
 
   app.disable("x-powered-by");
-  Logger.debug('Disabled "x-powered-by"');
+  Logger.debug('Disabled "X-Powered-By"');
 
   app.use("/api", apiRoutes());
   Logger.debug("API routes loaded");

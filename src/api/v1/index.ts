@@ -1,9 +1,10 @@
 import { Router } from "express";
+import auth from "./auth";
 
 export default (): Router => {
   const router = Router();
 
-  // put /api/v1 routes here
+  router.use("/auth", auth());
 
   return router;
 };

@@ -1,3 +1,5 @@
+import { Types as mongooseTypes } from "mongoose";
+
 export interface TeamSocials {
   twitter: string;
   website: string;
@@ -18,4 +20,22 @@ export interface ErrorResponse {
     details?: string;
     errorCode?: string;
   };
+}
+
+// User data that doesn't contain any sensitive information
+export interface BasicUserDetails {
+  id: mongooseTypes.ObjectId;
+  usernameCapitalization: string;
+}
+
+export interface TokenData {
+  jwtToken: string;
+  refreshToken: string;
+}
+
+// The full data that is returned by the user service when doing auth
+export interface AuthenticatedUserData {
+  user: BasicUserDetails;
+  jwtToken: string;
+  refreshToken: string;
 }
