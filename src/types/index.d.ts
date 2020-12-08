@@ -39,3 +39,14 @@ export interface AuthenticatedUserData {
   jwtToken: string;
   refreshToken: string;
 }
+
+export interface UserDetailsUpdateData {
+  username?: string;
+  capitalization?: string;
+  password?: string;
+}
+
+export interface JWTData {
+  id: string;
+  sub: string;
+}
