@@ -26,6 +26,8 @@ export interface ErrorResponse {
 export interface BasicUserDetails {
   id: mongooseTypes.ObjectId;
   usernameCapitalization: string;
+  isAdmin: boolean;
+  username: string;
 }
 
 export interface TokenData {
