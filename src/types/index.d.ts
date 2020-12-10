@@ -49,4 +49,5 @@ export interface UserDetailsUpdateData {
 export interface JWTData {
   id: string;
   sub: string;
+  isAdmin?: boolean;
 }

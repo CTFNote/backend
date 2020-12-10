@@ -15,7 +15,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { AuthenticatedUserData, BasicUserDetails, TokenData } from "../types";
+import { AuthenticatedUserData, BasicUserDetails, JWTData, TokenData } from "../types";
 
 const saltRounds = config.get("saltRounds");
 
@@ -50,6 +50,7 @@ export default class AuthService {
           username: username.toLowerCase(),
           password: hash,
           teams: [],
+          isAdmin: false
         }).save();
         return {
           user: this.basicDetails(newUser),
@@ -195,7 +196,14 @@ export default class AuthService {
    * @memberof AuthService
    */
   public generateAccesstoken(user: IUserModel): string {
-    return jwt.sign({ sub: user._id, id: user._id }, config.get("jwt.secret"), {
+
+    const jwtData: JWTData = { sub: user._id, id: user._id };
+
+    if (user.isAdmin) {
+      jwtData.isAdmin = true;
+    }
+
+    return jwt.sign(jwtData, config.get("jwt.secret"), {
       expiresIn: "15m",
     });
   }
