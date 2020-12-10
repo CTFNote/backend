@@ -8,6 +8,10 @@ import { BadRequestError } from "../types/httperrors";
 export default class UserService {
   /**
    * update user details (change username, update password, etc)
+   *
+   * @param {string} jwt the JWT used for auth
+   * @param {UserDetailsUpdateData} userDetails the data to update
+   * @memberof UserService
    */
   public async updateDetails(
     jwt: string,
