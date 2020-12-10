@@ -1,12 +1,9 @@
 import jsonWebToken from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 import config from "../config";
 import { UserModel } from "../models/User";
 import { JWTData, UserDetailsUpdateData } from "../types";
-import { BadRequestError, InternalServerError } from "../types/httperrors";
-
-const saltRounds = config.get("saltRounds");
+import { BadRequestError } from "../types/httperrors";
 
 export default class UserService {
   /**
