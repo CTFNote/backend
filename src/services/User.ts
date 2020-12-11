@@ -2,8 +2,9 @@ import jsonWebToken from "jsonwebtoken";
 
 import config from "../config";
 import { UserModel } from "../models/User";
-import { JWTData, UserDetailsUpdateData } from "../types";
-import { BadRequestError } from "../types/httperrors";
+import { BasicUserDetails, JWTData, UserDetailsUpdateData } from "../types";
+import { BadRequestError, ForbiddenError } from "../types/httperrors";
+import { basicDetails } from "../util";
 
 export default class UserService {
   /**
@@ -49,5 +50,42 @@ export default class UserService {
     }
 
     user.save();
+  }
+
+  /**
+   * get user details
+   *
+   * @param {string} jwt the JWT used for auth
+   * @memberof UserService
+   */
+  public async getDetails(
+    jwt: string,
+    options?: { user: string }
+  ): Promise<BasicUserDetails> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    let userID = (decodedJWT as JWTData).id;
+
+    if (options?.user) {
+      if ((decodedJWT as JWTData).isAdmin) {
+        userID = options.user;
+      } else {
+        throw new ForbiddenError();
+      }
+    }
+
+    const user = await UserModel.findById(userID).then();
+
+    if (!user) {
+      return;
+    }
+
+    return basicDetails(user);
   }
 }
