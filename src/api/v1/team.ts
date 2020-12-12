@@ -1,5 +1,6 @@
 import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
+
 import TeamService from "../../services/Team";
 import { UnauthorizedError } from "../../types/httperrors";
 

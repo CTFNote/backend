@@ -1,6 +1,6 @@
 import { Application, NextFunction, Request, Response } from "express";
 import { json } from "body-parser";
-import cors = require("cors");
+import cors from "cors";
 import { errors as celebrateErrors } from "celebrate";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
