@@ -46,7 +46,10 @@ export default class TeamService {
       throw new InternalServerError();
     });
 
+    owner.teams.push(team);
+
     team.save();
+    owner.save();
 
     return { teamName: team.name, teamID: team._id };
   }
