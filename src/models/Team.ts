@@ -6,7 +6,7 @@ import { IUserSchema } from "./User";
 
 interface ITeamSchema {
   name: string;
-  creator: IUserSchema;
+  owner: IUserSchema;
   socials: TeamSocials;
   members: Array<IUserSchema>;
   CTFs: Array<ICTFSchema>;
@@ -14,7 +14,7 @@ interface ITeamSchema {
 
 const TeamSchema = new Schema<ITeamSchema>({
   name: String,
-  creator: { type: Schema.Types.ObjectId, ref: "User" },
+  owner: { type: Schema.Types.ObjectId, ref: "User" },
   socials: Object,
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   CTFs: [{ type: Schema.Types.ObjectId, ref: "CTF" }],

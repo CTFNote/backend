@@ -37,7 +37,7 @@ export default class TeamService {
 
     const team = await TeamModel.create({
       name: teamName.toLowerCase(),
-      creator: owner,
+      owner,
       members: undefined,
       socials: undefined,
       CTFs: undefined,
