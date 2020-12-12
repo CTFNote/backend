@@ -1,11 +1,23 @@
+import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 import TeamService from "../../services/Team";
 import { UnauthorizedError } from "../../types/httperrors";
 
+const verifyTeamCreation = celebrate({
+  [Segments.HEADERS]: Joi.object({
+    authorization: Joi.string().regex(
+      /^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/
+    ).optional(),
+  }).unknown(true),
+  [Segments.BODY]: Joi.object({
+    teamName: Joi.string().required().min(3).max(64),
+  }),
+});
+
 export default (): Router => {
   const router = Router();
 
-  router.post("/", createTeam);
+  router.post("/", verifyTeamCreation, createTeam);
 
   return router;
 };
