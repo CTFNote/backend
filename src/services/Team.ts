@@ -8,7 +8,7 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { JWTData } from "../types";
+import { JWTData, TeamDetailsUpdateData } from "../types";
 import config from "../config";
 import Logger from "../loaders/logger";
 
@@ -90,6 +90,32 @@ export default class TeamService {
     } else {
       throw new UnauthorizedError();
     }
+
+    return team;
+  }
+
+  /**
+   * async updateTeam
+   */
+  public async updateTeam(
+    jwt: string,
+    teamID: string,
+    newDetails: TeamDetailsUpdateData
+  ): Promise<ITeamModel> {
+    const team = await this.getTeam(jwt, teamID);
+
+    if (newDetails.name) team.name = newDetails.name;
+
+    if (newDetails.socials?.twitter)
+      team.socials.twitter = newDetails.socials.twitter;
+
+    if (newDetails.socials?.website)
+      team.socials.website = newDetails.socials.twitter;
+
+    await team.save().catch((err) => {
+      Logger.warn(err);
+      throw new InternalServerError();
+    });
 
     return team;
   }

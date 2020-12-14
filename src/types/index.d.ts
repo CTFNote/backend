@@ -53,3 +53,8 @@ export interface JWTData {
   sub: string;
   isAdmin?: boolean;
 }
+
+export interface TeamDetailsUpdateData {
+  name: string;
+  socials: TeamSocials;
+}
