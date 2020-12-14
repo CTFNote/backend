@@ -7,6 +7,7 @@ interface IUserSchema {
   username: string;
   password: string;
   teams: Array<ITeamSchema>;
+  isAdmin: boolean;
 }
 
 const UserSchema = new Schema<IUserSchema>({
@@ -14,6 +15,7 @@ const UserSchema = new Schema<IUserSchema>({
   username: String,
   password: String,
   teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
+  isAdmin: Boolean,
 });
 
 interface IUserModel extends IUserSchema, Document {}

@@ -24,8 +24,10 @@ export interface ErrorResponse {
 
 // User data that doesn't contain any sensitive information
 export interface BasicUserDetails {
-  id: mongooseTypes.ObjectId;
+  id: mongooseTypes.ObjectId | string;
   usernameCapitalization: string;
+  isAdmin: boolean;
+  username: string;
 }
 
 export interface TokenData {
@@ -38,4 +40,16 @@ export interface AuthenticatedUserData {
   user: BasicUserDetails;
   jwtToken: string;
   refreshToken: string;
+}
+
+export interface UserDetailsUpdateData {
+  username?: string;
+  capitalization?: string;
+  password?: string;
+}
+
+export interface JWTData {
+  id: string;
+  sub: string;
+  isAdmin?: boolean;
 }

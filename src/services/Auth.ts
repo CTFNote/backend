@@ -15,7 +15,8 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { AuthenticatedUserData, BasicUserDetails, TokenData } from "../types";
+import { AuthenticatedUserData, BasicUserDetails, JWTData, TokenData } from "../types";
+import { basicDetails } from "../util";
 
 const saltRounds = config.get("saltRounds");
 
@@ -50,9 +51,10 @@ export default class AuthService {
           username: username.toLowerCase(),
           password: hash,
           teams: [],
+          isAdmin: false
         }).save();
         return {
-          user: this.basicDetails(newUser),
+          user: basicDetails(newUser),
           ...(await this.generateTokens(newUser, ipAddress)),
         };
       })
@@ -85,7 +87,7 @@ export default class AuthService {
       });
 
     return {
-      user: this.basicDetails(user),
+      user: basicDetails(user),
       ...(await this.generateTokens(user, ipAddress)),
     };
   }
@@ -140,7 +142,7 @@ export default class AuthService {
   public async getBasicUser(
     id: mongoose.Types.ObjectId
   ): Promise<BasicUserDetails> {
-    return this.basicDetails(await this.getFullUser(id));
+    return basicDetails(await this.getFullUser(id));
   }
 
   /**
@@ -181,7 +183,7 @@ export default class AuthService {
     const jwtToken = this.generateAccesstoken(user);
 
     return {
-      user: this.basicDetails(user),
+      user: basicDetails(user),
       jwtToken,
       refreshToken: newRefreshToken.token,
     };
@@ -195,7 +197,14 @@ export default class AuthService {
    * @memberof AuthService
    */
   public generateAccesstoken(user: IUserModel): string {
-    return jwt.sign({ sub: user._id, id: user._id }, config.get("jwt.secret"), {
+
+    const jwtData: JWTData = { sub: user._id, id: user._id };
+
+    if (user.isAdmin) {
+      jwtData.isAdmin = true;
+    }
+
+    return jwt.sign(jwtData, config.get("jwt.secret"), {
       expiresIn: "15m",
     });
   }
@@ -270,18 +279,5 @@ export default class AuthService {
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days to hours => minutes => seconds => miliseconds
     };
     res.cookie("refreshToken", token, cookieOptions);
-  }
-
-  /**
-   * maps a user document to a safer format without any sensitive details
-   *
-   * @private
-   * @param {IUserModel} user the user that is used
-   * @returns {BasicUserDetails} the user details with all sensitive details stripped
-   * @memberof AuthService
-   */
-  private basicDetails(user: IUserModel): BasicUserDetails {
-    const { id, usernameCapitalization } = user;
-    return { id, usernameCapitalization };
   }
 }
