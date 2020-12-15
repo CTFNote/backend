@@ -58,3 +58,8 @@ export interface TeamDetailsUpdateData {
   name: string;
   socials: TeamSocials;
 }
+
+export interface InviteOptions {
+  maxUses: number;
+  expiry: Date;
+}

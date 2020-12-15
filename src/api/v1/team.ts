@@ -66,6 +66,23 @@ const verifyUpdateOwner = celebrate({
   }),
 });
 
+const verifyCreateInvite = celebrate({
+  [Segments.HEADERS]: Joi.object({
+    authorization: Joi.string()
+      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
+      .optional(),
+  }).unknown(true),
+  [Segments.PARAMS]: Joi.object({
+    teamID: Joi.string()
+      .regex(/^[a-f\d]{24}$/i)
+      .required(),
+  }),
+  [Segments.BODY]: Joi.object({
+    maxUses: Joi.number().max(100).min(0),
+    expiry: Joi.date()
+  })
+});
+
 export default (): Router => {
   const router = Router();
 
@@ -73,6 +90,7 @@ export default (): Router => {
   router.get("/:teamID", verifyGetTeam, getTeam);
   router.patch("/:teamID", verifyUpdateTeam, updateTeam);
   router.post("/:teamID/updateOwner", verifyUpdateOwner, updateOwner);
+  router.post("/:teamID/invite", verifyCreateInvite, createInvite);
 
   return router;
 };
@@ -124,5 +142,20 @@ function updateOwner(req: Request, res: Response, next: NextFunction) {
       req.body.newOwner
     )
     .then((teamDetails) => res.send(teamDetails))
+    .catch((err) => next(err));
+}
+
+function createInvite(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    return next(new UnauthorizedError({ message: "Missing authorization" }));
+  }
+
+  teamService
+    .createInvite(
+      req.headers.authorization.slice(7),
+      req.params.teamID,
+      req.body
+    )
+    .then((data) => res.status(201).send(data))
     .catch((err) => next(err));
 }

@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import jsonWebToken from "jsonwebtoken";
 
 import { TeamModel, ITeamModel } from "../models/Team";
@@ -8,9 +9,10 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { JWTData, TeamDetailsUpdateData } from "../types";
+import { InviteOptions, JWTData, TeamDetailsUpdateData } from "../types";
 import config from "../config";
 import Logger from "../loaders/logger";
+import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
 
 export default class TeamService {
   /**
@@ -44,6 +46,7 @@ export default class TeamService {
       members: undefined,
       socials: undefined,
       CTFs: undefined,
+      invites: [],
     }).catch((err) => {
       Logger.error(`Error while creating team: ${err}`);
       throw new InternalServerError();
@@ -174,5 +177,66 @@ export default class TeamService {
     await team.depopulate("owner").depopulate("members").execPopulate();
 
     return team;
+  }
+
+  /**
+   * async createInvite
+   */
+  public async createInvite(
+    jwt: string,
+    teamID: string,
+    inviteOptions: InviteOptions
+  ): Promise<ITeamInviteModel> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    let user: IUserModel;
+    let team: ITeamModel;
+    await Promise.all([
+      UserModel.findById((decodedJWT as JWTData).id),
+      TeamModel.findById(teamID),
+    ])
+      .then((results) => {
+        user = results[0];
+        team = results[1];
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    if (!user.isAdmin) {
+      if (!(user._id === team.owner)) {
+        throw new BadRequestError({
+          message: "Only the team owner can create invites",
+          errorCode: "error_invalid_permissions",
+        });
+      }
+    }
+
+    const invite = new TeamInviteModel({
+      team: team._id,
+      inviteCode: randomBytes(3).toString("hex"),
+      expiry: inviteOptions.expiry ? inviteOptions.expiry : undefined,
+      maxUses: inviteOptions.maxUses ? inviteOptions.maxUses : undefined,
+      createdAt: new Date(),
+      createdByUser: user._id,
+      uses: [],
+    });
+
+    if (!team.invites) {
+      team.invites = [];
+    }
+
+    team.invites.push(invite._id);
+
+    await invite.save();
+    await team.save();
+
+    return invite;
   }
 }

@@ -10,6 +10,7 @@ interface ITeamSchema {
   socials: TeamSocials;
   members: Array<IUserSchema>;
   CTFs: Array<ICTFSchema>;
+  invites: Array<ITeamSchema>;
 }
 
 const TeamSchema = new Schema<ITeamSchema>({
@@ -18,6 +19,7 @@ const TeamSchema = new Schema<ITeamSchema>({
   socials: Object,
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   CTFs: [{ type: Schema.Types.ObjectId, ref: "CTF" }],
+  invites: [{ type: Schema.Types.ObjectId, ref: "TeamInvite" }],
 });
 
 interface ITeamModel extends ITeamSchema, Document {}
