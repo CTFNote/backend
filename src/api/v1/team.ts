@@ -43,9 +43,27 @@ const verifyUpdateTeam = celebrate({
     name: Joi.string().min(3).max(64),
     socials: Joi.object({
       website: Joi.string().uri(),
-      twitter: Joi.string().regex(/^@?(\w){1,15}$/)
-    })
-  })
+      twitter: Joi.string().regex(/^@?(\w){1,15}$/),
+    }),
+  }),
+});
+
+const verifyUpdateOwner = celebrate({
+  [Segments.HEADERS]: Joi.object({
+    authorization: Joi.string()
+      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
+      .optional(),
+  }).unknown(true),
+  [Segments.PARAMS]: Joi.object({
+    teamID: Joi.string()
+      .regex(/^[a-f\d]{24}$/i)
+      .required(),
+  }),
+  [Segments.BODY]: Joi.object({
+    newOwner: Joi.string()
+      .regex(/^[a-f\d]{24}$/i)
+      .required(),
+  }),
 });
 
 export default (): Router => {
@@ -54,6 +72,7 @@ export default (): Router => {
   router.post("/", verifyTeamCreation, createTeam);
   router.get("/:teamID", verifyGetTeam, getTeam);
   router.patch("/:teamID", verifyUpdateTeam, updateTeam);
+  router.post("/:teamID/updateOwner", verifyUpdateOwner, updateOwner);
 
   return router;
 };
@@ -90,5 +109,20 @@ function updateTeam(req: Request, res: Response, next: NextFunction) {
   teamService
     .updateTeam(req.headers.authorization.slice(7), req.params.teamID, req.body)
     .then((teamDetails) => res.status(200).send(teamDetails))
+    .catch((err) => next(err));
+}
+
+function updateOwner(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    return next(new UnauthorizedError({ message: "Missing authorization" }));
+  }
+
+  teamService
+    .updateOwner(
+      req.headers.authorization.slice(7),
+      req.params.teamID,
+      req.body.newOwner
+    )
+    .then((teamDetails) => res.send(teamDetails))
     .catch((err) => next(err));
 }

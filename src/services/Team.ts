@@ -1,7 +1,7 @@
 import jsonWebToken from "jsonwebtoken";
 
 import { TeamModel, ITeamModel } from "../models/Team";
-import { UserModel } from "../models/User";
+import { IUserModel, UserModel } from "../models/User";
 import {
   BadRequestError,
   ConflictError,
@@ -116,6 +116,62 @@ export default class TeamService {
       Logger.warn(err);
       throw new InternalServerError();
     });
+
+    return team;
+  }
+
+  /**
+   * async updateOwner
+   */
+  public async updateOwner(
+    jwt: string,
+    teamID: string,
+    newOwnerID: string
+  ): Promise<ITeamModel> {
+    let team: ITeamModel;
+    let oldOwner: IUserModel;
+    let newOwner: IUserModel;
+
+    await Promise.all([
+      this.getTeam(jwt, teamID),
+      UserModel.findById((jsonWebToken.decode(jwt) as JWTData).id),
+      UserModel.findById(newOwnerID),
+    ])
+      .then(async (results) => {
+        console.log(results);
+
+        team = await results[0]
+          .populate("owner")
+          .populate("members")
+          // .populate("CTFs")
+          .execPopulate();
+        oldOwner = await results[1].populate("teams").execPopulate();
+        newOwner = await results[2].populate("teams").execPopulate();
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    const decodedJWT = jsonWebToken.decode(jwt) as JWTData;
+
+    if (!decodedJWT.isAdmin) {
+      if (!(newOwner._id in team.members)) {
+        throw new BadRequestError({
+          message: "New owner must be in team before transfer of ownership",
+        });
+      }
+
+      if (!(oldOwner === team.owner)) {
+        throw new BadRequestError({
+          message: "Cannot transfer ownership",
+          errorCode: "error_user_not_owner",
+        });
+      }
+    }
+    team.owner = newOwner;
+    await team.save();
+
+    await team.depopulate("owner").depopulate("members").execPopulate();
 
     return team;
   }
