@@ -2,13 +2,13 @@ import { model, Document, Schema } from "mongoose";
 
 import { TeamSocials } from "../types";
 import { ICTFSchema } from "./CTF";
-import { IUserSchema } from "./User";
+import { IUserModel } from "./User";
 
 interface ITeamSchema {
   name: string;
-  owner: IUserSchema;
+  owner: IUserModel;
   socials: TeamSocials;
-  members: Array<IUserSchema>;
+  members: Array<IUserModel>;
   CTFs: Array<ICTFSchema>;
   invites: Array<ITeamSchema>;
 }
