@@ -369,4 +369,37 @@ export default class TeamService {
 
     return;
   }
+
+  public async deleteTeam(jwt: string, teamID: string): Promise<void> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    const user = await UserModel.findById((decodedJWT as JWTData).id);
+    const team = await TeamModel.findById(teamID);
+
+    if (!user.isAdmin) {
+      if (team.owner !== user._id)
+        throw new BadRequestError({
+          errorCode: "error_invalid_permissions",
+          message: "Only the team owner can delete the team",
+        });
+    }
+
+    user.teams = user.teams.splice(user.teams.indexOf(team._id), 1);
+
+    for (const member of team.members) {
+      member.teams = member.teams.splice(member.teams.indexOf(team._id), 1);
+      member.save();
+    }
+
+    await user.save();
+    await team.delete();
+
+    return;
+  }
 }

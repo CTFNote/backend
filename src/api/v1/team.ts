@@ -93,6 +93,7 @@ export default (): Router => {
   router.post("/:teamID/invite", verifyCreateInvite, createInvite);
   router.delete("/:teamID/invite/:inviteID", deleteInvite);
   router.post("/:teamID/leave", leaveTeam);
+  router.delete("/:teamID", deleteTeam);
 
   return router;
 };
@@ -180,6 +181,17 @@ function leaveTeam(req: Request, res: Response, next: NextFunction) {
 
   teamService
     .leaveTeam(req.headers.authorization.slice(7), req.params.teamID)
+    .then(() => res.sendStatus(204))
+    .catch((err) => next(err));
+}
+
+function deleteTeam(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    return next(new UnauthorizedError({ message: "Missing authorization" }));
+  }
+
+  teamService
+    .deleteTeam(req.headers.authorization.slice(7), req.params.teamID)
     .then(() => res.sendStatus(204))
     .catch((err) => next(err));
 }
