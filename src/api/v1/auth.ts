@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import AuthService from "../../services/Auth";
 import { notImplemented } from "../../util";
+import { refreshToken as joiRefreshToken } from "../../util/celebrate";
 
 const authService = new AuthService();
 
@@ -41,7 +42,7 @@ export default (): Router => {
     .post(
       celebrate({
         [Segments.COOKIES]: Joi.object({
-          refreshToken: Joi.string().length(128),
+          refreshToken: joiRefreshToken,
         }),
       }),
       logout
@@ -52,7 +53,7 @@ export default (): Router => {
     .post(
       celebrate({
         [Segments.COOKIES]: Joi.object({
-          refreshToken: Joi.string().length(128).required(),
+          refreshToken: joiRefreshToken.required(),
         }),
       }),
       refreshToken
