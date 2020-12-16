@@ -101,6 +101,8 @@ export default class TeamService {
       throw new UnauthorizedError();
     }
 
+    if (!team) throw new NotFoundError({ errorCode: "error_team_not_found" });
+
     return team;
   }
 
@@ -352,6 +354,8 @@ export default class TeamService {
 
     const user = await UserModel.findById((decodedJWT as JWTData).id);
     const team = await TeamModel.findById(teamID);
+
+    if (!team) throw new NotFoundError({ errorCode: "error_team_not_found" });
 
     if (team.owner === user)
       throw new ConflictError({
