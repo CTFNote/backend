@@ -335,4 +335,38 @@ export default class TeamService {
 
     return team;
   }
+
+  public async leaveTeam(jwt: string, teamID: string): Promise<void> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    const user = await UserModel.findById((decodedJWT as JWTData).id);
+    const team = await TeamModel.findById(teamID);
+
+    if (team.owner === user)
+      throw new ConflictError({
+        message: "Owner may not leave team",
+        details:
+          "The owner of a team cannot leave it without first changing the owner to a different member",
+      });
+
+    if (!(user._id in team.members))
+      throw new ConflictError({
+        message: "Cannot leave team",
+        errorCode: "error_not_in_team",
+      });
+
+    team.members = team.members.splice(team.members.indexOf(user._id), 1);
+    user.teams = user.teams.splice(user.teams.indexOf(team._id), 1);
+
+    team.save();
+    user.save();
+
+    return;
+  }
 }
