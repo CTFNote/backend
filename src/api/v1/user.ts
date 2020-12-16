@@ -37,6 +37,8 @@ async function getDetails(req: Request, res: Response, next: NextFunction) {
       req.headers.authorization.slice(7),
       req.params.userID ? { user: req.params.userID } : undefined
     )
-    .then((userData) => userData ? res.send(userData) : next(new NotFoundError()))
+    .then((userData) =>
+      userData ? res.send(userData) : next(new NotFoundError())
+    )
     .catch((err) => next(err));
 }

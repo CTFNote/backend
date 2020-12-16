@@ -10,7 +10,12 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { BasicInvite, InviteOptions, JWTData, TeamDetailsUpdateData } from "../types";
+import {
+  BasicInvite,
+  InviteOptions,
+  JWTData,
+  TeamDetailsUpdateData,
+} from "../types";
 import config from "../config";
 import Logger from "../loaders/logger";
 import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";

@@ -7,16 +7,24 @@ const authService = new AuthService();
 
 const newUserVerification = celebrate({
   [Segments.BODY]: Joi.object({
-    username: Joi.string().min(3).regex(/^([a-zA-Z0-9_.]|[^\s])+$/).required(),
-    password: Joi.string().min(8).regex(/^(?=(?:.*[A-Z]){1,})(?=.*[!@#$&*]{1,})(?=(?:.*[0-9]){1,})(?=(?:.*[a-z]){1,}).{8,}$/).required(),
+    username: Joi.string()
+      .min(3)
+      .regex(/^([a-zA-Z0-9_.]|[^\s])+$/)
+      .required(),
+    password: Joi.string()
+      .min(8)
+      .regex(
+        /^(?=(?:.*[A-Z]){1,})(?=.*[!@#$&*]{1,})(?=(?:.*[0-9]){1,})(?=(?:.*[a-z]){1,}).{8,}$/
+      )
+      .required(),
   }),
 });
 
 const verifyLoginCreds = celebrate({
   [Segments.BODY]: Joi.object({
     username: Joi.string().min(3).required(),
-    password: Joi.string().min(8).required()
-  })
+    password: Joi.string().min(8).required(),
+  }),
 });
 
 export default (): Router => {
