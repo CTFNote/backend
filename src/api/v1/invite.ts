@@ -4,6 +4,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { UnauthorizedError } from "../../types/httperrors";
 import TeamService from "../../services/Team";
 import { verifyAuthHeader } from "../../util/celebrate";
+import { notImplemented } from "../../util";
 
 const verifyInvite = celebrate({
   [Segments.PARAMS]: Joi.object({
@@ -14,8 +15,11 @@ const verifyInvite = celebrate({
 export default (): Router => {
   const router = Router();
 
-  router.get("/:inviteID", verifyAuthHeader, verifyInvite, getInvite);
-  router.post("/:inviteID", verifyAuthHeader, verifyInvite, useInvite);
+  router
+    .route("/:inviteID")
+    .get(verifyAuthHeader, verifyInvite, getInvite)
+    .post(verifyAuthHeader, verifyInvite, useInvite)
+    .all(notImplemented);
 
   return router;
 };

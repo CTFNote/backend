@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import TeamService from "../../services/Team";
 import { UnauthorizedError } from "../../types/httperrors";
+import { notImplemented } from "../../util";
 import {
   mongoDbObjectId,
   teamName,
@@ -44,19 +45,36 @@ const authAndTeam = [verifyAuthHeader, verifyTeamID];
 export default (): Router => {
   const router = Router();
 
-  router.post("/", verifyAuthHeader, verifyTeamCreation, createTeam);
-  router.get("/:teamID", authAndTeam, getTeam);
-  router.patch("/:teamID", authAndTeam, verifyUpdateTeam, updateTeam);
-  router.post(
-    "/:teamID/updateOwner",
-    authAndTeam,
-    verifyUpdateOwner,
-    updateOwner
-  );
-  router.post("/:teamID/invite", authAndTeam, verifyCreateInvite, createInvite);
-  router.delete("/:teamID/invite/:inviteID", authAndTeam, deleteInvite);
-  router.post("/:teamID/leave", verifyAuthHeader, verifyTeamID, leaveTeam);
-  router.delete("/:teamID", verifyAuthHeader, verifyTeamID, deleteTeam);
+  router
+    .route("/")
+    .post(verifyAuthHeader, verifyTeamCreation, createTeam)
+    .all();
+
+  router
+    .route("/:teamID")
+    .get(authAndTeam, getTeam)
+    .patch(authAndTeam, verifyUpdateTeam, updateTeam)
+    .delete(authAndTeam, deleteTeam)
+    .all(notImplemented);
+  router
+    .route("/:teamID/updateOwner")
+    .post(authAndTeam, verifyUpdateOwner, updateOwner)
+    .all(notImplemented);
+  router
+    .route("/:teamID/leave")
+    .post(authAndTeam, leaveTeam)
+    .all(notImplemented);
+
+  router
+    .route("/:teamID/invite")
+    .post(authAndTeam, verifyCreateInvite, createInvite)
+    .all(notImplemented);
+  router
+    .route("/:teamID/invite/:inviteID")
+    .delete(authAndTeam, deleteInvite)
+    .all(notImplemented);
+
+  // .all((_req: Request, _res: Response, next: NextFunction) => next(new NotImplementedError()));
 
   return router;
 };

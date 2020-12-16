@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import UserService from "../../services/User";
 import { NotFoundError, UnauthorizedError } from "../../types/httperrors";
+import { notImplemented } from "../../util";
 import { mongoDbObjectId } from "../../util/celebrate";
 
 const verifyUserID = celebrate({
@@ -12,8 +13,8 @@ const verifyUserID = celebrate({
 export default (): Router => {
   const router = Router();
 
-  router.patch("/", updateDetails);
-  router.get("/:userID?", verifyUserID, getDetails);
+  router.route("/").patch(updateDetails).all(notImplemented);
+  router.route("/:userID?").get(verifyUserID, getDetails).all(notImplemented);
 
   return router;
 };

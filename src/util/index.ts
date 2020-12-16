@@ -1,4 +1,7 @@
+import { Request, Response, NextFunction } from "express";
+
 import { BasicInvite, BasicUserDetails } from "../types";
+import { NotImplementedError } from "../types/httperrors";
 import { IUserModel } from "../models/User";
 import { ITeamInviteModel } from "../models/TeamInvite";
 
@@ -21,4 +24,8 @@ function basicInvite(invite: ITeamInviteModel): BasicInvite {
   return { inviteCode, createdByUser: userID, team: teamID };
 }
 
-export { basicDetails, basicInvite };
+const notImplemented = (_req: Request, _res: Response, next: NextFunction): void => {
+  next(new NotImplementedError());
+};
+
+export { basicDetails, basicInvite, notImplemented };

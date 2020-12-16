@@ -2,6 +2,7 @@ import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
 import AuthService from "../../services/Auth";
+import { notImplemented } from "../../util";
 
 const authService = new AuthService();
 
@@ -30,26 +31,33 @@ const verifyLoginCreds = celebrate({
 export default (): Router => {
   const router = Router();
 
-  router.post("/register", newUserVerification, register);
-  router.post("/login", verifyLoginCreds, login);
-  router.post(
-    "/logout",
-    celebrate({
-      [Segments.COOKIES]: Joi.object({
-        refreshToken: Joi.string().length(128),
+  router
+    .route("/register")
+    .post(newUserVerification, register)
+    .all(notImplemented);
+  router.route("/login").post(verifyLoginCreds, login).all(notImplemented);
+  router
+    .route("/logout")
+    .post(
+      celebrate({
+        [Segments.COOKIES]: Joi.object({
+          refreshToken: Joi.string().length(128),
+        }),
       }),
-    }),
-    logout
-  );
-  router.post(
-    "/refresh-token",
-    celebrate({
-      [Segments.COOKIES]: Joi.object({
-        refreshToken: Joi.string().length(128).required(),
+      logout
+    )
+    .all(notImplemented);
+  router
+    .route("/refresh-token")
+    .post(
+      celebrate({
+        [Segments.COOKIES]: Joi.object({
+          refreshToken: Joi.string().length(128).required(),
+        }),
       }),
-    }),
-    refreshToken
-  );
+      refreshToken
+    )
+    .all(notImplemented);
 
   return router;
 };
