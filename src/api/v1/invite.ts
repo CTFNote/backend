@@ -3,23 +3,19 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import { UnauthorizedError } from "../../types/httperrors";
 import TeamService from "../../services/Team";
+import { verifyAuthHeader } from "../../util/celebrate";
 
 const verifyInvite = celebrate({
   [Segments.PARAMS]: Joi.object({
     inviteID: Joi.string().length(6).hex(),
   }),
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string().regex(
-      /^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/
-    ),
-  }).unknown(true),
 });
 
 export default (): Router => {
   const router = Router();
 
-  router.get("/:inviteID", verifyInvite, getInvite);
-  router.post("/:inviteID", verifyInvite, useInvite);
+  router.get("/:inviteID", verifyAuthHeader, verifyInvite, getInvite);
+  router.post("/:inviteID", verifyAuthHeader, verifyInvite, useInvite);
 
   return router;
 };

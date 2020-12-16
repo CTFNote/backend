@@ -1,13 +1,19 @@
+import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
 import UserService from "../../services/User";
 import { NotFoundError, UnauthorizedError } from "../../types/httperrors";
+import { mongoDbObjectId } from "../../util/celebrate";
+
+const verifyUserID = celebrate({
+  [Segments.PARAMS]: Joi.object({ userID: mongoDbObjectId }).optional(),
+});
 
 export default (): Router => {
   const router = Router();
 
   router.patch("/", updateDetails);
-  router.get("/:userID?", getDetails);
+  router.get("/:userID?", verifyUserID, getDetails);
 
   return router;
 };

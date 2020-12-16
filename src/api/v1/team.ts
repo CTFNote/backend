@@ -3,44 +3,22 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import TeamService from "../../services/Team";
 import { UnauthorizedError } from "../../types/httperrors";
+import {
+  mongoDbObjectId,
+  teamName,
+  verifyAuthHeader,
+  verifyTeamID,
+} from "../../util/celebrate";
 
 const verifyTeamCreation = celebrate({
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string()
-      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
-      .optional(),
-  }).unknown(true),
   [Segments.BODY]: Joi.object({
-    teamName: Joi.string().required().min(3).max(64),
-  }),
-});
-
-const verifyGetTeam = celebrate({
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string()
-      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
-      .optional(),
-  }).unknown(true),
-  [Segments.PARAMS]: Joi.object({
-    teamID: Joi.string()
-      .regex(/^[a-f\d]{24}$/i)
-      .required(),
+    teamName: teamName.required(),
   }),
 });
 
 const verifyUpdateTeam = celebrate({
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string()
-      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
-      .optional(),
-  }).unknown(true),
-  [Segments.PARAMS]: Joi.object({
-    teamID: Joi.string()
-      .regex(/^[a-f\d]{24}$/i)
-      .required(),
-  }),
   [Segments.BODY]: Joi.object({
-    name: Joi.string().min(3).max(64),
+    name: teamName,
     socials: Joi.object({
       website: Joi.string().uri(),
       twitter: Joi.string().regex(/^@?(\w){1,15}$/),
@@ -49,51 +27,36 @@ const verifyUpdateTeam = celebrate({
 });
 
 const verifyUpdateOwner = celebrate({
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string()
-      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
-      .optional(),
-  }).unknown(true),
-  [Segments.PARAMS]: Joi.object({
-    teamID: Joi.string()
-      .regex(/^[a-f\d]{24}$/i)
-      .required(),
-  }),
   [Segments.BODY]: Joi.object({
-    newOwner: Joi.string()
-      .regex(/^[a-f\d]{24}$/i)
-      .required(),
+    newOwner: mongoDbObjectId.required(),
   }),
 });
 
 const verifyCreateInvite = celebrate({
-  [Segments.HEADERS]: Joi.object({
-    authorization: Joi.string()
-      .regex(/^Bearer [A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_.+/=]+$/)
-      .optional(),
-  }).unknown(true),
-  [Segments.PARAMS]: Joi.object({
-    teamID: Joi.string()
-      .regex(/^[a-f\d]{24}$/i)
-      .required(),
-  }),
   [Segments.BODY]: Joi.object({
     maxUses: Joi.number().max(100).min(0),
     expiry: Joi.date(),
   }),
 });
 
+const authAndTeam = [verifyAuthHeader, verifyTeamID];
+
 export default (): Router => {
   const router = Router();
 
-  router.post("/", verifyTeamCreation, createTeam);
-  router.get("/:teamID", verifyGetTeam, getTeam);
-  router.patch("/:teamID", verifyUpdateTeam, updateTeam);
-  router.post("/:teamID/updateOwner", verifyUpdateOwner, updateOwner);
-  router.post("/:teamID/invite", verifyCreateInvite, createInvite);
-  router.delete("/:teamID/invite/:inviteID", deleteInvite);
-  router.post("/:teamID/leave", leaveTeam);
-  router.delete("/:teamID", deleteTeam);
+  router.post("/", verifyAuthHeader, verifyTeamCreation, createTeam);
+  router.get("/:teamID", authAndTeam, getTeam);
+  router.patch("/:teamID", authAndTeam, verifyUpdateTeam, updateTeam);
+  router.post(
+    "/:teamID/updateOwner",
+    authAndTeam,
+    verifyUpdateOwner,
+    updateOwner
+  );
+  router.post("/:teamID/invite", authAndTeam, verifyCreateInvite, createInvite);
+  router.delete("/:teamID/invite/:inviteID", authAndTeam, deleteInvite);
+  router.post("/:teamID/leave", verifyAuthHeader, verifyTeamID, leaveTeam);
+  router.delete("/:teamID", verifyAuthHeader, verifyTeamID, deleteTeam);
 
   return router;
 };
