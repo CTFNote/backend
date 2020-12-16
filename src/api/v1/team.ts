@@ -79,8 +79,8 @@ const verifyCreateInvite = celebrate({
   }),
   [Segments.BODY]: Joi.object({
     maxUses: Joi.number().max(100).min(0),
-    expiry: Joi.date()
-  })
+    expiry: Joi.date(),
+  }),
 });
 
 export default (): Router => {
@@ -91,6 +91,7 @@ export default (): Router => {
   router.patch("/:teamID", verifyUpdateTeam, updateTeam);
   router.post("/:teamID/updateOwner", verifyUpdateOwner, updateOwner);
   router.post("/:teamID/invite", verifyCreateInvite, createInvite);
+  router.delete("/:teamID/invite/:inviteID", deleteInvite);
 
   return router;
 };
@@ -157,5 +158,16 @@ function createInvite(req: Request, res: Response, next: NextFunction) {
       req.body
     )
     .then((data) => res.status(201).send(data))
+    .catch((err) => next(err));
+}
+
+function deleteInvite(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    return next(new UnauthorizedError({ message: "Missing authorization" }));
+  }
+
+  teamService
+    .deleteInvite(req.headers.authorization.slice(7), req.params.inviteID)
+    .then(() => res.sendStatus(204))
     .catch((err) => next(err));
 }

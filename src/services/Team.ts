@@ -7,6 +7,7 @@ import {
   BadRequestError,
   ConflictError,
   InternalServerError,
+  NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
 import { BasicInvite, InviteOptions, JWTData, TeamDetailsUpdateData } from "../types";
@@ -274,5 +275,32 @@ export default class TeamService {
       return basicInvite(invite);
     }
     return invite;
+  }
+
+  public async deleteInvite(jwt: string, inviteID: string): Promise<void> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    const user = await UserModel.findById((decodedJWT as JWTData).id);
+    const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+
+    if (!invite) {
+      throw new NotFoundError({ message: "Invite not found" });
+    }
+
+    const team = invite.team;
+
+    if (!user.isAdmin) {
+      if (!(user === team.owner)) {
+        throw new BadRequestError({ errorCode: "error_invalid_permissions" });
+      }
+    }
+
+    await invite.delete();
   }
 }
