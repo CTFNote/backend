@@ -1,5 +1,6 @@
-import { BasicUserDetails } from "../types";
+import { BasicInvite, BasicUserDetails } from "../types";
 import { IUserModel } from "../models/User";
+import { ITeamInviteModel } from "../models/TeamInvite";
 
 /**
  * maps a user document to a safer format without any sensitive details
@@ -13,4 +14,11 @@ function basicDetails(user: IUserModel): BasicUserDetails {
   return { id, username, usernameCapitalization, isAdmin };
 }
 
-export { basicDetails };
+function basicInvite(invite: ITeamInviteModel): BasicInvite {
+  const { inviteCode, createdByUser, team } = invite;
+  const userID = createdByUser._id;
+  const teamID = team._id;
+  return { inviteCode, createdByUser: userID, team: teamID };
+}
+
+export { basicDetails, basicInvite };

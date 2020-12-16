@@ -63,3 +63,9 @@ export interface InviteOptions {
   maxUses: number;
   expiry: Date;
 }
+
+export interface BasicInvite {
+  team: mongooseTypes.ObjectId | string;
+  inviteCode: string;
+  createdByUser: mongooseTypes.ObjectId | string;
+}

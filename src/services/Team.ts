@@ -9,10 +9,11 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { InviteOptions, JWTData, TeamDetailsUpdateData } from "../types";
+import { BasicInvite, InviteOptions, JWTData, TeamDetailsUpdateData } from "../types";
 import config from "../config";
 import Logger from "../loaders/logger";
 import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
+import { basicInvite } from "../util";
 
 export default class TeamService {
   /**
@@ -237,6 +238,41 @@ export default class TeamService {
     await invite.save();
     await team.save();
 
+    return invite;
+  }
+
+  /**
+   * async getInvite
+   */
+  public async getInvite(
+    jwt: string | undefined,
+    inviteID: string
+  ): Promise<ITeamInviteModel | BasicInvite> {
+    const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+
+    let user: IUserModel;
+    if (jwt) {
+      /* eslint-disable-next-line */
+      let decodedJWT: string | object;
+      try {
+        decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+      } catch {
+        throw new BadRequestError({ message: "Invalid JWT" });
+      }
+
+      user = await UserModel.findById((decodedJWT as JWTData).id);
+    }
+
+    if (!user?.isAdmin) {
+      if (
+        invite.uses.length >= invite.maxUses ||
+        new Date() >= new Date(invite.expiry)
+      ) {
+        throw new BadRequestError({ errorCode: "error_expired_invite" });
+      }
+
+      return basicInvite(invite);
+    }
     return invite;
   }
 }
