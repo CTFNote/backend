@@ -32,7 +32,10 @@ RefreshTokenSchema.virtual("isExpired").get(function () {
 });
 
 RefreshTokenSchema.virtual("isActive").get(function () {
-  return !(this as IRefreshTokenSchema).revokedAt && !(this as IRefreshTokenSchema).isExpired;
+  return (
+    !(this as IRefreshTokenSchema).revokedAt &&
+    !(this as IRefreshTokenSchema).isExpired
+  );
 });
 
 RefreshTokenSchema.set("toJSON", {

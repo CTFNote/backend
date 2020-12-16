@@ -1,13 +1,20 @@
+import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
 import UserService from "../../services/User";
 import { NotFoundError, UnauthorizedError } from "../../types/httperrors";
+import { notImplemented } from "../../util";
+import { mongoDbObjectId } from "../../util/celebrate";
+
+const verifyUserID = celebrate({
+  [Segments.PARAMS]: Joi.object({ userID: mongoDbObjectId }).optional(),
+});
 
 export default (): Router => {
   const router = Router();
 
-  router.patch("/", updateDetails);
-  router.get("/:userID?", getDetails);
+  router.route("/").patch(updateDetails).all(notImplemented);
+  router.route("/:userID?").get(verifyUserID, getDetails).all(notImplemented);
 
   return router;
 };
@@ -37,6 +44,8 @@ async function getDetails(req: Request, res: Response, next: NextFunction) {
       req.headers.authorization.slice(7),
       req.params.userID ? { user: req.params.userID } : undefined
     )
-    .then((userData) => userData ? res.send(userData) : next(new NotFoundError()))
+    .then((userData) =>
+      userData ? res.send(userData) : next(new NotFoundError())
+    )
     .catch((err) => next(err));
 }

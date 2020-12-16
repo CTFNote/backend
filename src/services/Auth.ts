@@ -15,7 +15,12 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
-import { AuthenticatedUserData, BasicUserDetails, JWTData, TokenData } from "../types";
+import {
+  AuthenticatedUserData,
+  BasicUserDetails,
+  JWTData,
+  TokenData,
+} from "../types";
 import { basicDetails } from "../util";
 
 const saltRounds = config.get("saltRounds");
@@ -51,7 +56,7 @@ export default class AuthService {
           username: username.toLowerCase(),
           password: hash,
           teams: [],
-          isAdmin: false
+          isAdmin: false,
         }).save();
         return {
           user: basicDetails(newUser),
@@ -101,7 +106,11 @@ export default class AuthService {
    * @returns {Promise<void>}
    * @memberof AuthService
    */
-  public async logoutUser(token: string, ip: string, res: Response): Promise<void> {
+  public async logoutUser(
+    token: string,
+    ip: string,
+    res: Response
+  ): Promise<void> {
     this.revokeToken(token, ip);
     const options: CookieOptions = {
       httpOnly: true,
@@ -120,7 +129,10 @@ export default class AuthService {
    * @returns the jwt and refresh tokens
    * @memberof AuthService
    */
-  private async generateTokens(user: IUserModel, ipAddress: string): Promise<TokenData> {
+  private async generateTokens(
+    user: IUserModel,
+    ipAddress: string
+  ): Promise<TokenData> {
     const jwtToken = this.generateAccesstoken(user);
     const refreshToken = this.generateRefreshtoken(user, ipAddress);
 
@@ -197,7 +209,6 @@ export default class AuthService {
    * @memberof AuthService
    */
   public generateAccesstoken(user: IUserModel): string {
-
     const jwtData: JWTData = { sub: user._id, id: user._id };
 
     if (user.isAdmin) {

@@ -34,10 +34,11 @@ const config = convict({
     arg: "httpsPort",
   },
   httpsEnabled: {
-    doc: "Whether or not HTTPS should be enabled (for example when running in a docker container)",
+    doc:
+      "Whether or not HTTPS should be enabled (for example when running in a docker container)",
     format: Boolean,
     default: true,
-    env: "HTTPS_ENABLED"
+    env: "HTTPS_ENABLED",
   },
   cors: {
     doc: "What origins are allowed to connect to the backend",
@@ -84,8 +85,8 @@ const config = convict({
     doc: "How many times bcrypt will go over the password before returning it",
     format: Number,
     default: 10,
-    env: "JWT_ROUNDS"
-  }
+    env: "JWT_ROUNDS",
+  },
 });
 
 if (config.get("env") === "production") {

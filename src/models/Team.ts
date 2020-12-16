@@ -2,14 +2,15 @@ import { model, Document, Schema } from "mongoose";
 
 import { TeamSocials } from "../types";
 import { ICTFSchema } from "./CTF";
-import { IUserSchema } from "./User";
+import { IUserModel } from "./User";
 
 interface ITeamSchema {
   name: string;
-  owner: IUserSchema;
+  owner: IUserModel;
   socials: TeamSocials;
-  members: Array<IUserSchema>;
+  members: Array<IUserModel>;
   CTFs: Array<ICTFSchema>;
+  invites: Array<ITeamSchema>;
 }
 
 const TeamSchema = new Schema<ITeamSchema>({
@@ -18,6 +19,7 @@ const TeamSchema = new Schema<ITeamSchema>({
   socials: Object,
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   CTFs: [{ type: Schema.Types.ObjectId, ref: "CTF" }],
+  invites: [{ type: Schema.Types.ObjectId, ref: "TeamInvite" }],
 });
 
 interface ITeamModel extends ITeamSchema, Document {}

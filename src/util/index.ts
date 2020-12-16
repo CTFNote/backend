@@ -1,5 +1,9 @@
-import { BasicUserDetails } from "../types";
+import { Request, Response, NextFunction } from "express";
+
+import { BasicInvite, BasicUserDetails } from "../types";
+import { NotImplementedError } from "../types/httperrors";
 import { IUserModel } from "../models/User";
+import { ITeamInviteModel } from "../models/TeamInvite";
 
 /**
  * maps a user document to a safer format without any sensitive details
@@ -13,4 +17,15 @@ function basicDetails(user: IUserModel): BasicUserDetails {
   return { id, username, usernameCapitalization, isAdmin };
 }
 
-export { basicDetails };
+function basicInvite(invite: ITeamInviteModel): BasicInvite {
+  const { inviteCode, createdByUser, team } = invite;
+  const userID = createdByUser._id;
+  const teamID = team._id;
+  return { inviteCode, createdByUser: userID, team: teamID };
+}
+
+const notImplemented = (_req: Request, _res: Response, next: NextFunction): void => {
+  next(new NotImplementedError());
+};
+
+export { basicDetails, basicInvite, notImplemented };
