@@ -303,4 +303,36 @@ export default class TeamService {
 
     await invite.delete();
   }
+
+  /**
+   * async useInvite
+   */
+  public async useInvite(jwt: string, inviteID: string): Promise<ITeamModel> {
+    /* eslint-disable-next-line */
+    let decodedJWT: string | object;
+    try {
+      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
+    } catch {
+      throw new BadRequestError({ message: "Invalid JWT" });
+    }
+
+    const user = await UserModel.findById((decodedJWT as JWTData).id);
+    const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+
+    if (!invite) throw new NotFoundError({ message: "Invite not found" });
+
+    const team = invite.team;
+
+    team.members.push(user._id);
+    user.teams.push(team._id);
+    invite.uses.push(user._id);
+
+    Promise.all([team.save(), user.save(), invite.save()])
+      .then()
+      .catch((err) => {
+        throw err;
+      });
+
+    return team;
+  }
 }
