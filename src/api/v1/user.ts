@@ -23,7 +23,7 @@ const userService = new UserService();
 
 async function updateDetails(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ message: "Missing authorization" }));
+    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   userService
@@ -36,7 +36,7 @@ async function updateDetails(req: Request, res: Response, next: NextFunction) {
 
 async function getDetails(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ message: "Missing authorization" }));
+    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   userService

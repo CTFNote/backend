@@ -42,7 +42,7 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const owner = await UserModel.findById((decodedJWT as JWTData).id).then();
@@ -81,7 +81,7 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await (await UserModel.findById((decodedJWT as JWTData).id))
@@ -169,13 +169,13 @@ export default class TeamService {
     if (!decodedJWT.isAdmin) {
       if (!(newOwner._id in team.members)) {
         throw new BadRequestError({
-          message: "New owner must be in team before transfer of ownership",
+          errorMessage: "New owner must be in team before transfer of ownership",
         });
       }
 
       if (!(oldOwner === team.owner)) {
         throw new BadRequestError({
-          message: "Cannot transfer ownership",
+          errorMessage: "Cannot transfer ownership",
           errorCode: "error_user_not_owner",
         });
       }
@@ -201,7 +201,7 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     let user: IUserModel;
@@ -221,7 +221,7 @@ export default class TeamService {
     if (!user.isAdmin) {
       if (!(user._id === team.owner)) {
         throw new BadRequestError({
-          message: "Only the team owner can create invites",
+          errorMessage: "Only the team owner can create invites",
           errorCode: "error_invalid_permissions",
         });
       }
@@ -265,7 +265,7 @@ export default class TeamService {
       try {
         decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
       } catch {
-        throw new BadRequestError({ message: "Invalid JWT" });
+        throw new BadRequestError({ errorMessage: "Invalid JWT" });
       }
 
       user = await UserModel.findById((decodedJWT as JWTData).id);
@@ -290,14 +290,14 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id);
     const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
 
     if (!invite) {
-      throw new NotFoundError({ message: "Invite not found" });
+      throw new NotFoundError({ errorMessage: "Invite not found" });
     }
 
     const team = invite.team;
@@ -320,13 +320,13 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id);
     const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
 
-    if (!invite) throw new NotFoundError({ message: "Invite not found" });
+    if (!invite) throw new NotFoundError({ errorMessage: "Invite not found" });
 
     const team = invite.team;
 
@@ -349,7 +349,7 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id);
@@ -359,14 +359,14 @@ export default class TeamService {
 
     if (team.owner === user)
       throw new ConflictError({
-        message: "Owner may not leave team",
+        errorMessage: "Owner may not leave team",
         details:
           "The owner of a team cannot leave it without first changing the owner to a different member",
       });
 
     if (!(user._id in team.members))
       throw new ConflictError({
-        message: "Cannot leave team",
+        errorMessage: "Cannot leave team",
         errorCode: "error_not_in_team",
       });
 
@@ -385,7 +385,7 @@ export default class TeamService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id);
@@ -395,7 +395,7 @@ export default class TeamService {
       if (team.owner !== user._id)
         throw new BadRequestError({
           errorCode: "error_invalid_permissions",
-          message: "Only the team owner can delete the team",
+          errorMessage: "Only the team owner can delete the team",
         });
     }
 

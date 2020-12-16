@@ -83,7 +83,7 @@ const teamService = new TeamService();
 
 function createTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ message: "Missing authorization" }));
+    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -94,7 +94,7 @@ function createTeam(req: Request, res: Response, next: NextFunction) {
 
 function getTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ message: "Missing authorization" }));
+    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -105,7 +105,7 @@ function getTeam(req: Request, res: Response, next: NextFunction) {
 
 function updateTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -116,7 +116,7 @@ function updateTeam(req: Request, res: Response, next: NextFunction) {
 
 function updateOwner(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -131,7 +131,7 @@ function updateOwner(req: Request, res: Response, next: NextFunction) {
 
 function createInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -146,7 +146,7 @@ function createInvite(req: Request, res: Response, next: NextFunction) {
 
 function deleteInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -157,7 +157,7 @@ function deleteInvite(req: Request, res: Response, next: NextFunction) {
 
 function leaveTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService
@@ -168,7 +168,7 @@ function leaveTeam(req: Request, res: Response, next: NextFunction) {
 
 function deleteTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService

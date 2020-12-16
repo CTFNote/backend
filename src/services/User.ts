@@ -23,7 +23,7 @@ export default class UserService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id).then();
@@ -67,7 +67,7 @@ export default class UserService {
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
-      throw new BadRequestError({ message: "Invalid JWT" });
+      throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     let userID = (decodedJWT as JWTData).id;

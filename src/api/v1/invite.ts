@@ -35,7 +35,7 @@ function getInvite(req: Request, res: Response, next: NextFunction) {
 
 function useInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ message: "Missing authorization" }));
+    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
   teamService

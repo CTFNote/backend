@@ -64,8 +64,11 @@ export default (app: Application): void => {
 
   app.use(
     (err: any, req: Request, res: Response, _next: NextFunction): void => {
+      Logger.warn(err.message);
       res.status(err.statusCode || 500);
-      const response: ErrorResponse = { errors: { message: err.message } };
+      const response: ErrorResponse = {
+        errors: { errorMessage: err.errorMessage || "Internal Server Error" },
+      };
       if (err.details) response.errors.details = err.details;
       if (err.errorCode) response.errors.errorCode = err.errorCode;
       res.send(response);

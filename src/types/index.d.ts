@@ -5,10 +5,10 @@ export interface TeamSocials {
   website: string;
 }
 
-// The params an error message can take
+// The params an error errorMessage can take
 export interface ErrorMessageParams {
   statusCode?: number;
-  message?: string;
+  errorMessage?: string;
   details?: string;
   errorCode?: string;
 }
@@ -16,7 +16,7 @@ export interface ErrorMessageParams {
 // The data that is sent back to the client on an error
 export interface ErrorResponse {
   errors: {
-    message: string;
+    errorMessage: string;
     details?: string;
     errorCode?: string;
   };
