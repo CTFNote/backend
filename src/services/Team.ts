@@ -97,16 +97,14 @@ export default class TeamService {
         throw new InternalServerError();
       });
 
-    let team: ITeamModel;
-    if (teamID in user.teams) {
-      team = await TeamModel.findById(teamID);
-    } else if ((decodedJWT as JWTData).isAdmin) {
-      team = await TeamModel.findById(teamID);
-    } else {
-      throw new UnauthorizedError();
-    }
-
+    const team = await TeamModel.findById(teamID);
     if (!team) throw new NotFoundError({ errorCode: "error_team_not_found" });
+
+    if (!user.isAdmin) {
+      if (!team.inTeam(user)) {
+        throw new UnauthorizedError({ errorCode: "error_invalid_permissionseeeee"  });
+      }
+    }
 
     return team;
   }
@@ -184,7 +182,7 @@ export default class TeamService {
     const decodedJWT = jsonWebToken.decode(jwt) as JWTData;
 
     if (!decodedJWT.isAdmin) {
-      if (!(newOwner._id in team.members)) {
+      if (!(team.inTeam(newOwner))) {
         throw new BadRequestError({
           errorMessage:
             "New owner must be in team before transfer of ownership",
@@ -414,7 +412,7 @@ export default class TeamService {
           "The owner of a team cannot leave it without first changing the owner to a different member",
       });
 
-    if (!(user._id in team.members))
+    if (!team.inTeam(user))
       throw new ConflictError({
         errorMessage: "Cannot leave team",
         errorCode: "error_not_in_team",
