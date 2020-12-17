@@ -4,17 +4,19 @@ export interface IHTTPError extends Error {
   statusCode?: number;
   details?: string;
   errorCode?: string;
+  errorMessage?: string;
 }
 
 export class HTTPError extends Error implements IHTTPError {
   statusCode: number;
   details?: string;
   errorCode?: string;
+  errorMessage?: string;
   constructor(HTTPErrorConfig?: ErrorMessageParams) {
     super(HTTPErrorConfig.errorMessage || "Internal Server Error");
 
     this.name = this.constructor.name;
-
+    this.errorMessage = HTTPErrorConfig.errorMessage || "Internal Server Error";
     this.statusCode = HTTPErrorConfig.statusCode || 500;
     if (HTTPErrorConfig.details) this.details = HTTPErrorConfig.details;
     if (HTTPErrorConfig.errorCode) this.errorCode = HTTPErrorConfig.errorCode;
