@@ -23,7 +23,12 @@ import { basicInvite } from "../util";
 
 export default class TeamService {
   /**
-   * createTeam
+   * create a new team
+   *
+   * @param {string} jwt the JWT of the user creating the team
+   * @param {string} teamName the name of the team
+   * @returns {Promise<{ teamName: string; teamID: string }>} returns the team data
+   * @memberof TeamService
    */
   public async createTeam(
     jwt: string,
@@ -107,7 +112,13 @@ export default class TeamService {
   }
 
   /**
-   * async updateTeam
+   * update team details
+   *
+   * @param {string} jwt the JWT of the user performing the operation
+   * @param {string} teamID the id of the team being modified
+   * @param {TeamDetailsUpdateData} newDetails the new team details
+   * @returns {Promise<ITeamModel>} the new team
+   * @memberof TeamService
    */
   public async updateTeam(
     jwt: string,
@@ -133,7 +144,13 @@ export default class TeamService {
   }
 
   /**
-   * async updateOwner
+   * change the team owner
+   *
+   * @param {string} jwt the JWT of the user performing the operation
+   * @param {string} teamID the ID of the team being modified
+   * @param {string} newOwnerID the ID of the new owner
+   * @returns {Promise<ITeamModel>} the new team
+   * @memberof TeamService
    */
   public async updateOwner(
     jwt: string,
@@ -169,7 +186,8 @@ export default class TeamService {
     if (!decodedJWT.isAdmin) {
       if (!(newOwner._id in team.members)) {
         throw new BadRequestError({
-          errorMessage: "New owner must be in team before transfer of ownership",
+          errorMessage:
+            "New owner must be in team before transfer of ownership",
         });
       }
 
@@ -189,7 +207,13 @@ export default class TeamService {
   }
 
   /**
-   * async createInvite
+   * create an invite to the team
+   *
+   * @param {string} jwt the JWT of the user performing the operation
+   * @param {string} teamID the id of the team being modified
+   * @param {InviteOptions} inviteOptions options for the invite
+   * @returns {Promise<ITeamInviteModel>} the invite created
+   * @memberof TeamService
    */
   public async createInvite(
     jwt: string,
@@ -250,7 +274,12 @@ export default class TeamService {
   }
 
   /**
-   * async getInvite
+   * gets an invite
+   *
+   * @param {(string | undefined)} jwt the JWT of the user performind the operation, if present
+   * @param {string} inviteID the ID of the invite being requested
+   * @returns {(Promise<ITeamInviteModel | BasicInvite>)} return either a basic invite for normal users or a complete invite for admins
+   * @memberof TeamService
    */
   public async getInvite(
     jwt: string | undefined,
@@ -284,6 +313,14 @@ export default class TeamService {
     return invite;
   }
 
+  /**
+   * deletes an invite
+   *
+   * @param {string} jwt the ID of the user performing the operation
+   * @param {string} inviteID the invite to delete's ID
+   * @returns {Promise<void>} void
+   * @memberof TeamService
+   */
   public async deleteInvite(jwt: string, inviteID: string): Promise<void> {
     /* eslint-disable-next-line */
     let decodedJWT: string | object;
@@ -312,7 +349,12 @@ export default class TeamService {
   }
 
   /**
-   * async useInvite
+   * uses an invite and adds a user to the team
+   *
+   * @param {string} jwt the JWT of the user performing the operation. This is the user that will be added to the team
+   * @param {string} inviteID the ID of the team in question
+   * @returns {Promise<ITeamModel>} the team the user was added to
+   * @memberof TeamService
    */
   public async useInvite(jwt: string, inviteID: string): Promise<ITeamModel> {
     /* eslint-disable-next-line */
@@ -343,6 +385,14 @@ export default class TeamService {
     return team;
   }
 
+  /**
+   * removes a user from a team
+   *
+   * @param {string} jwt the JWT of the user to remove
+   * @param {string} teamID the ID of the team
+   * @returns {Promise<void>} void
+   * @memberof TeamService
+   */
   public async leaveTeam(jwt: string, teamID: string): Promise<void> {
     /* eslint-disable-next-line */
     let decodedJWT: string | object;
@@ -379,6 +429,14 @@ export default class TeamService {
     return;
   }
 
+  /**
+   * deletes a team. Only the team owner and admins can delete a team
+   *
+   * @param {string} jwt the JWT of the user performing the operation
+   * @param {string} teamID the team to be deleted
+   * @returns {Promise<void>} void
+   * @memberof TeamService
+   */
   public async deleteTeam(jwt: string, teamID: string): Promise<void> {
     /* eslint-disable-next-line */
     let decodedJWT: string | object;
