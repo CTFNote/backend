@@ -50,28 +50,30 @@ export default (): Router => {
     .post(verifyAuthHeader, verifyTeamCreation, createTeam)
     .all();
 
+  router.use("/:teamID", authAndTeam);
+
   router
     .route("/:teamID")
-    .get(authAndTeam, getTeam)
-    .patch(authAndTeam, verifyUpdateTeam, updateTeam)
-    .delete(authAndTeam, deleteTeam)
+    .get(getTeam)
+    .patch(verifyUpdateTeam, updateTeam)
+    .delete(deleteTeam)
     .all(notImplemented);
   router
     .route("/:teamID/updateOwner")
-    .post(authAndTeam, verifyUpdateOwner, updateOwner)
+    .post(verifyUpdateOwner, updateOwner)
     .all(notImplemented);
   router
     .route("/:teamID/leave")
-    .post(authAndTeam, leaveTeam)
+    .post(leaveTeam)
     .all(notImplemented);
 
   router
     .route("/:teamID/invite")
-    .post(authAndTeam, verifyCreateInvite, createInvite)
+    .post(verifyCreateInvite, createInvite)
     .all(notImplemented);
   router
     .route("/:teamID/invite/:inviteID")
-    .delete(authAndTeam, deleteInvite)
+    .delete(deleteInvite)
     .all(notImplemented);
 
   // .all((_req: Request, _res: Response, next: NextFunction) => next(new NotImplementedError()));
