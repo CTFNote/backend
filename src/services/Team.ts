@@ -191,7 +191,7 @@ export default class TeamService {
         });
       }
 
-      if (!(oldOwner === team.owner)) {
+      if (!team.isOwner(oldOwner)) {
         throw new BadRequestError({
           errorMessage: "Cannot transfer ownership",
           errorCode: "error_user_not_owner",
@@ -243,7 +243,7 @@ export default class TeamService {
       });
 
     if (!user.isAdmin) {
-      if (!(user._id === team.owner)) {
+      if (!team.isOwner(user)) {
         throw new BadRequestError({
           errorMessage: "Only the team owner can create invites",
           errorCode: "error_invalid_permissions",
@@ -340,7 +340,7 @@ export default class TeamService {
     const team = invite.team;
 
     if (!user.isAdmin) {
-      if (!(user === team.owner)) {
+      if (!team.isOwner(user)) {
         throw new BadRequestError({ errorCode: "error_invalid_permissions" });
       }
     }
@@ -407,7 +407,7 @@ export default class TeamService {
 
     if (!team) throw new NotFoundError({ errorCode: "error_team_not_found" });
 
-    if (team.owner === user)
+    if (team.isOwner(user))
       throw new ConflictError({
         errorMessage: "Owner may not leave team",
         details:
@@ -450,7 +450,7 @@ export default class TeamService {
     const team = await TeamModel.findById(teamID);
 
     if (!user.isAdmin) {
-      if (team.owner !== user._id)
+      if (!team.isOwner(user))
         throw new BadRequestError({
           errorCode: "error_invalid_permissions",
           errorMessage: "Only the team owner can delete the team",
