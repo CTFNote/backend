@@ -40,24 +40,30 @@ export default class AuthService {
     password: string,
     ipAddress: string
   ): Promise<AuthenticatedUserData> {
+    Logger.verbose("Registering user");
     const userAlreadyExists = await UserModel.findOne({
       username: username.toLowerCase(),
     }).then();
 
-    if (userAlreadyExists)
+    if (userAlreadyExists) {
+      Logger.debug("Username taken; User exists");
       throw new ConflictError({ errorCode: "error_user_exists" });
+    }
 
     return bcrypt
       .hash(password, saltRounds)
       .then(async (hash) => {
-        Logger.silly("Saving new user to the DB");
-        const newUser = await new UserModel({
+        Logger.silly("Creating new user");
+        const newUser = new UserModel({
           usernameCapitalization: username,
           username: username.toLowerCase(),
           password: hash,
           teams: [],
           isAdmin: false,
-        }).save();
+        });
+        Logger.silly("Saving new user to the DB");
+        await newUser.save();
+        Logger.silly("Returning basic user details and tokens");
         return {
           user: basicDetails(newUser),
           ...(await this.generateTokens(newUser, ipAddress)),
@@ -83,14 +89,20 @@ export default class AuthService {
     password: string,
     ipAddress: string
   ): Promise<AuthenticatedUserData> {
+    Logger.verbose("Authenticating user");
     const user = await UserModel.findOne({ username: username.toLowerCase() });
 
-    if (!user || !(await bcrypt.compare(password, user.password)))
+    Logger.debug({ user });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      Logger.verbose("Invalid credentials to login");
       throw new BadRequestError({
         errorCode: "error_invalid_credentials",
         details: "Username or password is incorrect",
       });
+    }
 
+    Logger.silly("Returning basic user details after logon");
     return {
       user: basicDetails(user),
       ...(await this.generateTokens(user, ipAddress)),
@@ -111,12 +123,14 @@ export default class AuthService {
     ip: string,
     res: Response
   ): Promise<void> {
+    Logger.verbose("Revoking token (Logout)");
     this.revokeToken(token, ip);
     const options: CookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
     };
+    Logger.silly("Clearing cookie");
     res.clearCookie("refreshToken", options);
   }
 
@@ -133,11 +147,14 @@ export default class AuthService {
     user: IUserModel,
     ipAddress: string
   ): Promise<TokenData> {
+    Logger.verbose("Generating tokens");
     const jwtToken = this.generateAccesstoken(user);
     const refreshToken = this.generateRefreshtoken(user, ipAddress);
 
+    Logger.silly("Saving tokens");
     await refreshToken.save();
 
+    Logger.silly("Returning tokens");
     return {
       jwtToken,
       refreshToken: refreshToken.token,
@@ -154,6 +171,7 @@ export default class AuthService {
   public async getBasicUser(
     id: mongoose.Types.ObjectId
   ): Promise<BasicUserDetails> {
+    Logger.verbose("Returning basic user details");
     return basicDetails(await this.getFullUser(id));
   }
 
@@ -165,11 +183,20 @@ export default class AuthService {
    * @memberof AuthService
    */
   public async getFullUser(id: mongoose.Types.ObjectId): Promise<IUserModel> {
-    if (!isValidObjectId(id))
+    Logger.silly("Checking for valid ObjectId");
+    if (!isValidObjectId(id)) {
       throw new BadRequestError({ errorCode: "error_invalid_id" });
+    }
 
+    Logger.silly("Fetching user for getFullUser");
     const user = await UserModel.findById(id).then();
-    if (!user) throw new NotFoundError({ errorCode: "error_user_not_found" });
+
+    if (!user) {
+      Logger.silly("User not found, throwing");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    Logger.silly("Returning full user");
     return user;
   }
 
@@ -185,15 +212,25 @@ export default class AuthService {
     token: string,
     ipAddress: string
   ): Promise<AuthenticatedUserData> {
+    Logger.verbose("Refreshing refreshToken");
+
     const refreshToken = (await this.getRefreshToken(token)).populate("User");
     const user = await this.getFullUser(refreshToken.user._id);
+    Logger.debug({ refreshToken, user });
 
+    Logger.silly("Generating refresh token");
     const newRefreshToken = this.generateRefreshtoken(user, ipAddress);
+
+    Logger.silly("Revoking old token");
     await this.revokeToken(token, ipAddress, newRefreshToken.token);
+
+    Logger.silly("Saving new token");
     await newRefreshToken.save();
 
+    Logger.silly("Generating accessToken");
     const jwtToken = this.generateAccesstoken(user);
 
+    Logger.silly("Returning user, jwtToken, and refreshToken");
     return {
       user: basicDetails(user),
       jwtToken,
@@ -214,7 +251,9 @@ export default class AuthService {
     if (user.isAdmin) {
       jwtData.isAdmin = true;
     }
+    Logger.debug(jwtData);
 
+    Logger.silly("Returning signed JWT with 15 minute expiry");
     return jwt.sign(jwtData, config.get("jwt.secret"), {
       expiresIn: "15m",
     });
@@ -230,8 +269,12 @@ export default class AuthService {
   public async getRefreshToken(token: string): Promise<IRefreshTokenModel> {
     const refreshToken = await RefreshToken.findOne({ token }).then();
 
-    if (!refreshToken || !refreshToken.isActive)
+    if (!refreshToken || !refreshToken.isActive) {
+      Logger.silly("Invalid token");
+      Logger.debug(refreshToken);
       throw new UnauthorizedError({ errorCode: "error_invalid_token" });
+    }
+
     return refreshToken.populate("User").populate("user");
   }
 
@@ -271,7 +314,10 @@ export default class AuthService {
 
     refreshToken.revokedAt = new Date();
     refreshToken.revokedByIP = ipAddress;
-    if (replacedByToken) refreshToken.replacedByToken = replacedByToken;
+    if (replacedByToken) {
+      refreshToken.replacedByToken = replacedByToken;
+    }
+    Logger.silly("Saving old refreshToken and returning void");
     await refreshToken.save();
   }
 
@@ -289,6 +335,7 @@ export default class AuthService {
       sameSite: "strict",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days to hours => minutes => seconds => miliseconds
     };
+    Logger.silly("Setting refresh token cookie");
     res.cookie("refreshToken", token, cookieOptions);
   }
 }
