@@ -1,6 +1,7 @@
 import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
+import Logger from "../../loaders/logger";
 import AuthService from "../../services/Auth";
 import { notImplemented } from "../../util";
 import { refreshToken as joiRefreshToken } from "../../util/celebrate";
@@ -64,39 +65,52 @@ export default (): Router => {
 };
 
 async function register(req: Request, res: Response, next: NextFunction) {
+  Logger.verbose("Registering new user");
+  Logger.debug({ username: req.body.username });
   await authService
     .registerUser(req.body.username, req.body.password, req.ip)
     .then(({ refreshToken, ...user }) => {
+      Logger.silly("Setting cookie");
       authService.setRefreshTokenCookie(res, refreshToken);
+      Logger.silly("Returning new user data");
       res.status(201).send(user);
     })
     .catch((err) => next(err));
 }
 
 async function login(req: Request, res: Response, next: NextFunction) {
+  Logger.verbose("Authenticating user");
+  Logger.debug({ username: req.body.username });
   await authService
     .authenticateUser(req.body.username, req.body.password, req.ip)
     .then(({ refreshToken, ...user }) => {
+      Logger.silly("Setting cookie");
       authService.setRefreshTokenCookie(res, refreshToken);
+      Logger.silly("Returning user data");
       res.status(200).send(user);
     })
     .catch((err) => next(err));
 }
 
 async function logout(req: Request, res: Response, next: NextFunction) {
+  Logger.verbose("Logging out user");
   await authService
     .logoutUser(req.cookies.refreshToken, req.ip, res)
     .then(() => {
+      Logger.silly("Returning with status 204");
       res.status(204).send();
     })
     .catch((err) => next(err));
 }
 
 async function refreshToken(req: Request, res: Response, next: NextFunction) {
+  Logger.verbose("Generating new refresh token");
   await authService
     .refreshRefreshToken(req.cookies.refreshToken, req.ip)
     .then(({ refreshToken, ...user }) => {
+      Logger.silly("Setting new refresh token");
       authService.setRefreshTokenCookie(res, refreshToken);
+      Logger.silly("Returning user data");
       res.status(200).send(user);
     })
     .catch((err) => next(err));

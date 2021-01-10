@@ -1,6 +1,7 @@
 import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
+import Logger from "../../loaders/logger";
 import TeamService from "../../services/Team";
 import { UnauthorizedError } from "../../types/httperrors";
 import { notImplemented } from "../../util";
@@ -62,10 +63,7 @@ export default (): Router => {
     .route("/:teamID/updateOwner")
     .post(verifyUpdateOwner, updateOwner)
     .all(notImplemented);
-  router
-    .route("/:teamID/leave")
-    .post(leaveTeam)
-    .all(notImplemented);
+  router.route("/:teamID/leave").post(leaveTeam).all(notImplemented);
 
   router
     .route("/:teamID/invite")
@@ -88,9 +86,14 @@ function createTeam(req: Request, res: Response, next: NextFunction) {
     next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
+  Logger.verbose("Creating new team");
+  Logger.debug({ ...req.body });
   teamService
     .createTeam(req.headers.authorization.slice(7), req.body.teamName)
-    .then((teamData) => res.status(201).send(teamData))
+    .then((teamData) => {
+      Logger.silly("Sending team data for new team");
+      res.status(201).send(teamData);
+    })
     .catch((err) => next(err));
 }
 
@@ -99,82 +102,129 @@ function getTeam(req: Request, res: Response, next: NextFunction) {
     next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
+  Logger.verbose("Getting information on a team");
+  Logger.debug({ ...req.body });
   teamService
     .getTeam(req.headers.authorization.slice(7), req.params.teamID)
-    .then((teamDetails) => res.send(teamDetails))
+    .then((teamDetails) => {
+      Logger.silly("Sending team data");
+      res.send(teamDetails);
+    })
     .catch((err) => next(err));
 }
 
 function updateTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Updating team details");
+  Logger.debug({ ...req.body });
   teamService
     .updateTeam(req.headers.authorization.slice(7), req.params.teamID, req.body)
-    .then((teamDetails) => res.status(200).send(teamDetails))
+    .then((teamDetails) => {
+      Logger.silly("Sending new team details");
+      res.status(200).send(teamDetails);
+    })
     .catch((err) => next(err));
 }
 
 function updateOwner(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Changing team owner");
+  Logger.debug({ ...req.body });
   teamService
     .updateOwner(
       req.headers.authorization.slice(7),
       req.params.teamID,
       req.body.newOwner
     )
-    .then((teamDetails) => res.send(teamDetails))
+    .then((teamDetails) => {
+      Logger.silly("Sending new team details");
+      res.send(teamDetails);
+    })
     .catch((err) => next(err));
 }
 
 function createInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Creating new team invite");
+  Logger.debug({ ...req.body, ...req.params });
   teamService
     .createInvite(
       req.headers.authorization.slice(7),
       req.params.teamID,
       req.body
     )
-    .then((data) => res.status(201).send(data))
+    .then((data) => {
+      Logger.silly("Sending invite data");
+      res.status(201).send(data);
+    })
     .catch((err) => next(err));
 }
 
 function deleteInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Deleting team invite");
+  Logger.debug({ ...req.params });
   teamService
     .deleteInvite(req.headers.authorization.slice(7), req.params.inviteID)
-    .then(() => res.sendStatus(204))
+    .then(() => {
+      Logger.silly("Sending status 204 for successful deletion");
+      res.sendStatus(204);
+    })
     .catch((err) => next(err));
 }
 
 function leaveTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Leaving team");
+  Logger.debug({ ...req.params });
   teamService
     .leaveTeam(req.headers.authorization.slice(7), req.params.teamID)
-    .then(() => res.sendStatus(204))
+    .then(() => {
+      Logger.silly("Sending status 204 for successful leave");
+      res.sendStatus(204);
+    })
     .catch((err) => next(err));
 }
 
 function deleteTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    return next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    return next(
+      new UnauthorizedError({ errorMessage: "Missing authorization" })
+    );
   }
 
+  Logger.verbose("Deleting team");
+  Logger.debug({ ...req.params });
   teamService
     .deleteTeam(req.headers.authorization.slice(7), req.params.teamID)
-    .then(() => res.sendStatus(204))
+    .then(() => {
+      Logger.silly("Sending status 204 for successful deletion");
+      res.sendStatus(204);
+    })
     .catch((err) => next(err));
 }

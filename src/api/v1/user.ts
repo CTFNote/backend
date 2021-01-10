@@ -1,6 +1,7 @@
 import { celebrate, Joi, Segments } from "celebrate";
 import { NextFunction, Request, Response, Router } from "express";
 
+import Logger from "../../loaders/logger";
 import UserService from "../../services/User";
 import { NotFoundError, UnauthorizedError } from "../../types/httperrors";
 import { notImplemented } from "../../util";
@@ -26,9 +27,12 @@ async function updateDetails(req: Request, res: Response, next: NextFunction) {
     next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
+  Logger.verbose("Updating user details");
+  Logger.debug({ ...req.body });
   userService
     .updateDetails(req.headers.authorization.slice(7), req.body)
     .then(() => {
+      Logger.silly("Sending status 204 for confirmed new details");
       res.status(204).send();
     })
     .catch((err) => next(err));
@@ -39,13 +43,16 @@ async function getDetails(req: Request, res: Response, next: NextFunction) {
     next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
   }
 
+  Logger.verbose("Getting user details");
+  Logger.debug({ ...req.params });
   userService
     .getDetails(
       req.headers.authorization.slice(7),
       req.params.userID ? { user: req.params.userID } : undefined
     )
-    .then((userData) =>
-      userData ? res.send(userData) : next(new NotFoundError())
-    )
+    .then((userData) => {
+      Logger.silly("Sending user details");
+      userData ? res.send(userData) : next(new NotFoundError());
+    })
     .catch((err) => next(err));
 }

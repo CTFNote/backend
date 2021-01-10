@@ -5,6 +5,7 @@ import { UserModel } from "../models/User";
 import { BasicUserDetails, JWTData, UserDetailsUpdateData } from "../types";
 import { BadRequestError, ForbiddenError } from "../types/httperrors";
 import { basicDetails } from "../util";
+import Logger from "../loaders/logger";
 
 export default class UserService {
   /**
@@ -18,22 +19,27 @@ export default class UserService {
     jwt: string,
     userDetails: UserDetailsUpdateData
   ): Promise<void> {
+    Logger.verbose("Updating user details");
     /* eslint-disable-next-line */
     let decodedJWT: string | object;
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
+      Logger.verbose("Invalid JWT");
       throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
     const user = await UserModel.findById((decodedJWT as JWTData).id).then();
+    Logger.debug(user);
 
     if (userDetails.username) {
+      Logger.silly("Updating username");
       if (
         await UserModel.findOne({
           username: userDetails.username.toLowerCase(),
         }).then()
       ) {
+        Logger.verbose("Username already taken");
         throw new BadRequestError();
       }
       user.username = userDetails.username;
@@ -41,14 +47,19 @@ export default class UserService {
     }
 
     if (userDetails.capitalization) {
+      Logger.silly("Updating username capitalization");
       if (
         userDetails.capitalization.toLowerCase() !== user.username.toLowerCase()
       ) {
+        Logger.verbose(
+          "Invalid username capitalization (usernames don't match)"
+        );
         throw new BadRequestError();
       }
       user.usernameCapitalization = userDetails.capitalization;
     }
 
+    Logger.debug("Saving new user");
     user.save();
   }
 
@@ -62,11 +73,13 @@ export default class UserService {
     jwt: string,
     options?: { user: string }
   ): Promise<BasicUserDetails> {
+    Logger.verbose("Getting user details");
     /* eslint-disable-next-line */
     let decodedJWT: string | object;
     try {
       decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
     } catch {
+      Logger.verbose("Invalid JWT");
       throw new BadRequestError({ errorMessage: "Invalid JWT" });
     }
 
@@ -74,8 +87,12 @@ export default class UserService {
 
     if (options?.user) {
       if ((decodedJWT as JWTData).isAdmin) {
+        Logger.verbose("User is admin");
         userID = options.user;
       } else {
+        Logger.info(
+          "User tried to access info on other user without admin perms"
+        );
         throw new ForbiddenError();
       }
     }
@@ -86,6 +103,7 @@ export default class UserService {
       return;
     }
 
+    Logger.silly("Returning basic user details");
     return basicDetails(user);
   }
 }

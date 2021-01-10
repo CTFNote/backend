@@ -64,7 +64,10 @@ export default (app: Application): void => {
 
   app.use(
     (err: any, req: Request, res: Response, _next: NextFunction): void => {
-      Logger.warn(err.message);
+      Logger.warn({
+        message: err.message,
+        errorMessage: err.errorMessage || "Internal Server Error",
+      });
       res.status(err.statusCode || 500);
       const response: ErrorResponse = {
         errors: { errorMessage: err.errorMessage || "Internal Server Error" },
