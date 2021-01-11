@@ -47,7 +47,7 @@ export default class AuthService {
 
     if (userAlreadyExists) {
       Logger.debug("Username taken; User exists");
-      throw new ConflictError({ errorCode: "error_user_exists" });
+      throw new ConflictError({ errorMessage: "This username is already taken", errorCode: "error_user_exists" });
     }
 
     return bcrypt

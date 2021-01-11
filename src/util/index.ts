@@ -27,7 +27,11 @@ function basicInvite(invite: ITeamInviteModel): BasicInvite {
   return { inviteCode, createdByUser: userID, team: teamID };
 }
 
-const notImplemented = (_req: Request, _res: Response, next: NextFunction): void => {
+const notImplemented = (
+  _req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
   next(new NotImplementedError());
 };
 
@@ -38,7 +42,10 @@ function verifyJWT(jwt: string): JWTData {
     decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
   } catch {
     Logger.verbose("Invalid JWT");
-    throw new BadRequestError({ errorMessage: "Invalid JWT" });
+    throw new BadRequestError({
+      errorMessage: "Invalid JWT",
+      errorCode: "error_jwt_invalid",
+    });
   }
   return decodedJWT as JWTData;
 }

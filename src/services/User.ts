@@ -30,7 +30,10 @@ export default class UserService {
         }).then()
       ) {
         Logger.verbose("Username already taken");
-        throw new BadRequestError();
+        throw new BadRequestError({
+          errorMessage: "Username is taken",
+          errorCode: "error_user_exists",
+        });
       }
       user.username = userDetails.username;
       user.usernameCapitalization = userDetails.username.toLowerCase();
@@ -44,7 +47,10 @@ export default class UserService {
         Logger.verbose(
           "Invalid username capitalization (usernames don't match)"
         );
-        throw new BadRequestError();
+        throw new BadRequestError({
+          errorMessage: "Capitalization and username must match",
+          errorCode: "error_invalid_username",
+        });
       }
       user.usernameCapitalization = userDetails.capitalization;
     }
@@ -77,7 +83,10 @@ export default class UserService {
         Logger.info(
           "User tried to access info on other user without admin perms"
         );
-        throw new ForbiddenError();
+        throw new ForbiddenError({
+          errorMessage: "You do not have access to this user",
+          errorCode: "error_forbidden",
+        });
       }
     }
 

@@ -9,11 +9,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../types/httperrors";
-import {
-  BasicInvite,
-  InviteOptions,
-  TeamDetailsUpdateData,
-} from "../types";
+import { BasicInvite, InviteOptions, TeamDetailsUpdateData } from "../types";
 import Logger from "../loaders/logger";
 import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
 import { basicInvite, verifyJWT } from "../util";
@@ -40,7 +36,10 @@ export default class TeamService {
 
     if (teamExists) {
       Logger.debug("Team already exists");
-      throw new ConflictError({ errorCode: "error_team_exists" });
+      throw new ConflictError({
+        errorMessage: "A team with this name already exists",
+        errorCode: "error_team_exists",
+      });
     }
 
     const decodedJWT = verifyJWT(jwt);
@@ -205,6 +204,7 @@ export default class TeamService {
       if (!team.inTeam(newOwner)) {
         Logger.verbose("New owner not in team");
         throw new BadRequestError({
+          errorCode: "error_invalid_user",
           errorMessage:
             "New owner must be in team before transfer of ownership",
         });
@@ -375,7 +375,7 @@ export default class TeamService {
     Logger.debug({ user, invite });
 
     if (!invite) {
-      throw new NotFoundError({ errorMessage: "Invite not found" });
+      throw new NotFoundError({ errorMessage: "Invite not found", errorCode: "error_invalid_invite" });
     }
 
     const team = invite.team;
@@ -423,7 +423,7 @@ export default class TeamService {
 
     if (!invite) {
       Logger.verbose("Invite doesn't exist");
-      throw new NotFoundError({ errorMessage: "Invite not found" });
+      throw new NotFoundError({ errorMessage: "Invite not found", errorCode: "error_invalid_invite" });
     }
 
     const team = invite.team;

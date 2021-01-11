@@ -83,7 +83,12 @@ const teamService = new TeamService();
 
 function createTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
   }
 
   Logger.verbose("Creating new team");
@@ -99,7 +104,12 @@ function createTeam(req: Request, res: Response, next: NextFunction) {
 
 function getTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ errorMessage: "Missing authorization" }));
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
   }
 
   Logger.verbose("Getting information on a team");
@@ -116,7 +126,10 @@ function getTeam(req: Request, res: Response, next: NextFunction) {
 function updateTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
@@ -134,7 +147,10 @@ function updateTeam(req: Request, res: Response, next: NextFunction) {
 function updateOwner(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
@@ -156,7 +172,10 @@ function updateOwner(req: Request, res: Response, next: NextFunction) {
 function createInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
@@ -178,7 +197,10 @@ function createInvite(req: Request, res: Response, next: NextFunction) {
 function deleteInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
@@ -196,7 +218,10 @@ function deleteInvite(req: Request, res: Response, next: NextFunction) {
 function leaveTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
@@ -214,7 +239,10 @@ function leaveTeam(req: Request, res: Response, next: NextFunction) {
 function deleteTeam(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
     );
   }
 
