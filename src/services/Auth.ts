@@ -214,7 +214,7 @@ export default class AuthService {
   ): Promise<AuthenticatedUserData> {
     Logger.verbose("Regenerating refreshToken");
 
-    const refreshToken = (await this.getRefreshToken(token)).populate("User");
+    const refreshToken = await (await this.getRefreshToken(token)).populate("User").execPopulate();
     const user = await this.getFullUser(refreshToken.user._id);
     Logger.debug({ refreshToken, user });
 
@@ -275,7 +275,7 @@ export default class AuthService {
       throw new UnauthorizedError({ errorCode: "error_invalid_token" });
     }
 
-    return refreshToken.populate("User").populate("user");
+    return await refreshToken.populate("user").execPopulate();
   }
 
   /**
