@@ -1,8 +1,5 @@
-import jsonWebToken from "jsonwebtoken";
-
-import config from "../config";
 import { UserModel } from "../models/User";
-import { BasicUserDetails, JWTData, UserDetailsUpdateData } from "../types";
+import { BasicUserDetails, UserDetailsUpdateData } from "../types";
 import { BadRequestError, ForbiddenError } from "../types/httperrors";
 import { basicDetails, verifyJWT } from "../util";
 import Logger from "../loaders/logger";

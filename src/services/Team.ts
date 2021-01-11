@@ -1,5 +1,4 @@
 import { randomBytes } from "crypto";
-import jsonWebToken from "jsonwebtoken";
 
 import { TeamModel, ITeamModel } from "../models/Team";
 import { IUserModel, UserModel } from "../models/User";
@@ -15,7 +14,6 @@ import {
   InviteOptions,
   TeamDetailsUpdateData,
 } from "../types";
-import config from "../config";
 import Logger from "../loaders/logger";
 import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
 import { basicInvite, verifyJWT } from "../util";
