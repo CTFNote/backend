@@ -395,8 +395,21 @@ export default class TeamService {
     }
 
     Logger.silly("Getting user and team");
-    const user = await UserModel.findById((decodedJWT as JWTData).id);
-    const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+    let user;
+    let invite;
+
+    Promise.all([
+      UserModel.findById((decodedJWT as JWTData).id),
+      TeamInviteModel.findOne({ inviteCode: inviteID }),
+    ])
+      .then((results) => {
+        user = results[0];
+        invite = results[1];
+      })
+      .catch((err) => {
+        throw err;
+      });
+
     Logger.debug({ user, invite });
 
     if (!invite) {
@@ -436,8 +449,21 @@ export default class TeamService {
     }
 
     Logger.silly("Getting user and invite");
-    const user = await UserModel.findById((decodedJWT as JWTData).id);
-    const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+    let user: IUserModel;
+    let invite: ITeamInviteModel;
+
+    Promise.all([
+      UserModel.findById((decodedJWT as JWTData).id),
+      TeamInviteModel.findOne({ inviteCode: inviteID }),
+    ])
+      .then((results) => {
+        user = results[0];
+        invite = results[1];
+      })
+      .catch((err) => {
+        throw err;
+      });
+
     Logger.debug({ user, invite });
 
     if (!invite) {
@@ -483,8 +509,21 @@ export default class TeamService {
     }
 
     Logger.silly("Getting user and team");
-    const user = await UserModel.findById((decodedJWT as JWTData).id);
-    const team = await TeamModel.findById(teamID);
+    let user: IUserModel;
+    let team: ITeamModel;
+
+    Promise.all([
+      UserModel.findById((decodedJWT as JWTData).id),
+      TeamModel.findById(teamID),
+    ])
+      .then((results) => {
+        user = results[0];
+        team = results[1];
+      })
+      .catch((err) => {
+        throw err;
+      });
+
     Logger.debug({ user, team });
 
     if (!team) {
@@ -540,8 +579,21 @@ export default class TeamService {
     }
 
     Logger.silly("Getting user and team");
-    const user = await UserModel.findById((decodedJWT as JWTData).id);
-    const team = await TeamModel.findById(teamID);
+
+    let user: IUserModel;
+    let team: ITeamModel;
+
+    Promise.all([
+      UserModel.findById((decodedJWT as JWTData).id),
+      TeamModel.findById(teamID),
+    ])
+      .then((results) => {
+        user = results[0];
+        team = results[1];
+      })
+      .catch((err) => {
+        throw err;
+      });
     Logger.debug({ user, team });
 
     if (!user.isAdmin) {
