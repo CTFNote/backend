@@ -13,13 +13,12 @@ import {
 import {
   BasicInvite,
   InviteOptions,
-  JWTData,
   TeamDetailsUpdateData,
 } from "../types";
 import config from "../config";
 import Logger from "../loaders/logger";
 import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
-import { basicInvite } from "../util";
+import { basicInvite, verifyJWT } from "../util";
 
 export default class TeamService {
   /**
@@ -46,16 +45,9 @@ export default class TeamService {
       throw new ConflictError({ errorCode: "error_team_exists" });
     }
 
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
-    const owner = await UserModel.findById((decodedJWT as JWTData).id).then();
+    const owner = await UserModel.findById(decodedJWT.id).then();
     Logger.debug({ owner });
 
     Logger.silly("Creating new team");
@@ -93,17 +85,10 @@ export default class TeamService {
    */
   public async getTeam(jwt: string, teamID: string): Promise<ITeamModel> {
     Logger.verbose("Getting team");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user");
-    const user = await (await UserModel.findById((decodedJWT as JWTData).id))
+    const user = await (await UserModel.findById(decodedJWT.id))
       .execPopulate()
       .then()
       .catch((err) => {
@@ -189,6 +174,8 @@ export default class TeamService {
     newOwnerID: string
   ): Promise<ITeamModel> {
     Logger.silly("Updating team owner");
+    const decodedJWT = verifyJWT(jwt);
+
     let team: ITeamModel;
     let oldOwner: IUserModel;
     let newOwner: IUserModel;
@@ -196,7 +183,7 @@ export default class TeamService {
     Logger.silly("Getting team, old owner, and new owner");
     await Promise.all([
       this.getTeam(jwt, teamID),
-      UserModel.findById((jsonWebToken.decode(jwt) as JWTData).id),
+      UserModel.findById(decodedJWT.id),
       UserModel.findById(newOwnerID),
     ])
       .then(async (results) => {
@@ -215,8 +202,6 @@ export default class TeamService {
       });
 
     Logger.debug({ team, oldOwner, newOwner });
-
-    const decodedJWT = jsonWebToken.decode(jwt) as JWTData;
 
     if (!decodedJWT.isAdmin) {
       if (!team.inTeam(newOwner)) {
@@ -264,20 +249,13 @@ export default class TeamService {
     inviteOptions: InviteOptions
   ): Promise<ITeamInviteModel> {
     Logger.verbose("Inviting user to team");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
     let user: IUserModel;
     let team: ITeamModel;
     await Promise.all([
-      UserModel.findById((decodedJWT as JWTData).id),
+      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
     ])
       .then((results) => {
@@ -344,16 +322,9 @@ export default class TeamService {
 
     let user: IUserModel;
     if (jwt) {
-      /* eslint-disable-next-line */
-      let decodedJWT: string | object;
-      try {
-        decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-      } catch {
-        Logger.verbose("Invalid JWT");
-        throw new BadRequestError({ errorMessage: "Invalid JWT" });
-      }
+      const decodedJWT = verifyJWT(jwt);
 
-      user = await UserModel.findById((decodedJWT as JWTData).id);
+      user = await UserModel.findById(decodedJWT.id);
     } else {
       Logger.verbose("User is not authenticated");
     }
@@ -385,21 +356,14 @@ export default class TeamService {
    */
   public async deleteInvite(jwt: string, inviteID: string): Promise<void> {
     Logger.verbose("Deleting invite");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
     let user;
     let invite;
 
     Promise.all([
-      UserModel.findById((decodedJWT as JWTData).id),
+      UserModel.findById(decodedJWT.id),
       TeamInviteModel.findOne({ inviteCode: inviteID }),
     ])
       .then((results) => {
@@ -439,21 +403,14 @@ export default class TeamService {
    */
   public async useInvite(jwt: string, inviteID: string): Promise<ITeamModel> {
     Logger.verbose("Using invite and adding user to team");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and invite");
     let user: IUserModel;
     let invite: ITeamInviteModel;
 
     Promise.all([
-      UserModel.findById((decodedJWT as JWTData).id),
+      UserModel.findById(decodedJWT.id),
       TeamInviteModel.findOne({ inviteCode: inviteID }),
     ])
       .then((results) => {
@@ -499,23 +456,13 @@ export default class TeamService {
    */
   public async leaveTeam(jwt: string, teamID: string): Promise<void> {
     Logger.verbose("User is leaving team");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
     let user: IUserModel;
     let team: ITeamModel;
 
-    Promise.all([
-      UserModel.findById((decodedJWT as JWTData).id),
-      TeamModel.findById(teamID),
-    ])
+    Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
       .then((results) => {
         user = results[0];
         team = results[1];
@@ -569,24 +516,13 @@ export default class TeamService {
    */
   public async deleteTeam(jwt: string, teamID: string): Promise<void> {
     Logger.verbose("Deleting team");
-    /* eslint-disable-next-line */
-    let decodedJWT: string | object;
-    try {
-      decodedJWT = jsonWebToken.verify(jwt, config.get("jwt.secret"));
-    } catch {
-      Logger.verbose("Invalid JWT");
-      throw new BadRequestError({ errorMessage: "Invalid JWT" });
-    }
+    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-
     let user: IUserModel;
     let team: ITeamModel;
 
-    Promise.all([
-      UserModel.findById((decodedJWT as JWTData).id),
-      TeamModel.findById(teamID),
-    ])
+    Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
       .then((results) => {
         user = results[0];
         team = results[1];
