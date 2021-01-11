@@ -148,8 +148,8 @@ export default class AuthService {
     ipAddress: string
   ): Promise<TokenData> {
     Logger.verbose("Generating tokens");
-    const jwtToken = this.generateAccesstoken(user);
-    const refreshToken = this.generateRefreshtoken(user, ipAddress);
+    const jwtToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user, ipAddress);
 
     Logger.silly("Saving tokens");
     await refreshToken.save();
@@ -204,22 +204,22 @@ export default class AuthService {
    * generates a new refresh token while revoking the old one
    *
    * @param {string} token the token to revoke
-   * @param {string} ipAddress the ip adress that is refreshing the token
+   * @param {string} ipAddress the ip adress that is regenerating the token
    * @returns user details along with a JWT and the new refresh token
    * @memberof AuthService
    */
-  public async refreshRefreshToken(
+  public async regenerateRefreshToken(
     token: string,
     ipAddress: string
   ): Promise<AuthenticatedUserData> {
-    Logger.verbose("Refreshing refreshToken");
+    Logger.verbose("Regenerating refreshToken");
 
     const refreshToken = (await this.getRefreshToken(token)).populate("User");
     const user = await this.getFullUser(refreshToken.user._id);
     Logger.debug({ refreshToken, user });
 
     Logger.silly("Generating refresh token");
-    const newRefreshToken = this.generateRefreshtoken(user, ipAddress);
+    const newRefreshToken = this.generateRefreshToken(user, ipAddress);
 
     Logger.silly("Revoking old token");
     await this.revokeToken(token, ipAddress, newRefreshToken.token);
@@ -228,7 +228,7 @@ export default class AuthService {
     await newRefreshToken.save();
 
     Logger.silly("Generating accessToken");
-    const jwtToken = this.generateAccesstoken(user);
+    const jwtToken = this.generateAccessToken(user);
 
     Logger.silly("Returning user, jwtToken, and refreshToken");
     return {
@@ -245,7 +245,7 @@ export default class AuthService {
    * @returns {string} the JWT
    * @memberof AuthService
    */
-  public generateAccesstoken(user: IUserModel): string {
+  public generateAccessToken(user: IUserModel): string {
     const jwtData: JWTData = { sub: user._id, id: user._id };
 
     if (user.isAdmin) {
@@ -285,7 +285,7 @@ export default class AuthService {
    * @param {string} ipAddress what ip address is generating the new refresh token
    * @memberof AuthService
    */
-  public generateRefreshtoken(
+  public generateRefreshToken(
     user: IUserModel,
     ipAddress: string
   ): IRefreshTokenModel {
