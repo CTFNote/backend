@@ -85,7 +85,7 @@ const config = convict({
     doc: "How many times bcrypt will go over the password before returning it",
     format: Number,
     default: 10,
-    env: "JWT_ROUNDS",
+    env: "SALT_ROUNDS",
   },
 });
 
