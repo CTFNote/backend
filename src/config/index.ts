@@ -74,6 +74,12 @@ const config = convict({
       env: "JWT_SECRET",
       default: "",
     },
+    duration: {
+      doc: "How long the JWT will last",
+      format: String,
+      env: "JWT_DURATION",
+      default: "15m",
+    },
   },
   saltRounds: {
     doc: "How many times bcrypt will go over the password before returning it",

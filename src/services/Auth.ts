@@ -255,7 +255,7 @@ export default class AuthService {
 
     Logger.silly("Returning signed JWT with 15 minute expiry");
     return jwt.sign(jwtData, config.get("jwt.secret"), {
-      expiresIn: "15m",
+      expiresIn: config.get("jwt.duration"),
     });
   }
 
