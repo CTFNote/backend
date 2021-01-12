@@ -74,18 +74,18 @@ const config = convict({
       env: "JWT_SECRET",
       default: "",
     },
-    refreshToken: {
-      doc: "A refresh token for refreshing JWTs? idk",
+    duration: {
+      doc: "How long the JWT will last",
       format: String,
-      env: "JWT_REFRESH",
-      default: "",
+      env: "JWT_DURATION",
+      default: "15m",
     },
   },
   saltRounds: {
     doc: "How many times bcrypt will go over the password before returning it",
     format: Number,
     default: 10,
-    env: "JWT_ROUNDS",
+    env: "SALT_ROUNDS",
   },
 });
 

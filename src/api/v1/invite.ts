@@ -42,7 +42,7 @@ function getInvite(req: Request, res: Response, next: NextFunction) {
 function useInvite(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
     return next(
-      new UnauthorizedError({ errorMessage: "Missing authorization" })
+      new UnauthorizedError({ errorMessage: "Missing authorization", errorCode: "error_unauthorized" })
     );
   }
 

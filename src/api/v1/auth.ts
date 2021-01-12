@@ -106,7 +106,7 @@ async function logout(req: Request, res: Response, next: NextFunction) {
 async function refreshToken(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Generating new refresh token");
   await authService
-    .refreshRefreshToken(req.cookies.refreshToken, req.ip)
+    .regenerateRefreshToken(req.cookies.refreshToken, req.ip)
     .then(({ refreshToken, ...user }) => {
       Logger.silly("Setting new refresh token");
       authService.setRefreshTokenCookie(res, refreshToken);
