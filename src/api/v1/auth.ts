@@ -12,7 +12,7 @@ const newUserVerification = celebrate({
   [Segments.BODY]: Joi.object({
     username: Joi.string()
       .min(3)
-      .regex(/^([a-zA-Z0-9_.]|[^\s])+$/)
+      .regex(/^[a-zA-Z0-9_\-.]{3,32}$/)
       .required(),
     password: Joi.string()
       .min(8)
