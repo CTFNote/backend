@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.0](https://github.com/CTFNote/backend/compare/v0.1.0-alpha...v0.1.0-alpha.0) (2021-01-15)
+
+
+### Bug Fixes
+
+* fix username regex ([457dce2](https://github.com/CTFNote/backend/commit/457dce2f4e98adf4dac495a6aba4133b9a861c5a))
+
+
+### Chore
+
+* **deps:** pin dependencies ([6453ec1](https://github.com/CTFNote/backend/commit/6453ec1f76caf3752d403f248ae3e98329cbf491))
+* **deps:** update dependency @types/convict to v5.2.2 ([b654714](https://github.com/CTFNote/backend/commit/b6547145fb19e733bdaa0bf25852c842fff8a9f7))
+* **deps:** update dependency @types/express to v4.17.11 ([1b02fb9](https://github.com/CTFNote/backend/commit/1b02fb93b89c0e5db671a334630f65ced9df9d3d))
+* **deps:** update dependency eslint to v7.17.0 ([2649c77](https://github.com/CTFNote/backend/commit/2649c7735f9be416e2b1f172cad0d5edac9199e8))
+* **deps:** update dependency husky to v4.3.7 ([d9aca07](https://github.com/CTFNote/backend/commit/d9aca076b72f461129183f1147e5d4bbac674a7e))
+* **deps:** update dependency nodemon to v2.0.7 ([306f9cf](https://github.com/CTFNote/backend/commit/306f9cf88765199f346678b5a9c8334d1011a63b))
+* **deps:** update node docker tag to v14.15 ([e2f1740](https://github.com/CTFNote/backend/commit/e2f1740079f64cb4f29ffb9e1ff66cc85f399617))
+* **deps:** update typescript-eslint monorepo to v4.13.0 ([250b982](https://github.com/CTFNote/backend/commit/250b9826ec4bb98954d60c909572173bf249fd90))
+
+
+### Style
+
+* implement EOL rules ([4b10595](https://github.com/CTFNote/backend/commit/4b105958c0ff56234d2c1f61739d60f1f346c02b))
+
+
+### Refactor
+
+* move exports to below const declaration ([876c573](https://github.com/CTFNote/backend/commit/876c573b77876d82b9e02fda929e15085f2776de))
+
 ## 0.1.0-alpha (2021-01-12)
 
 
