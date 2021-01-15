@@ -30,6 +30,8 @@ export default class TeamService {
     Logger.verbose("Creating new team");
     // TODO: Turn this into a proper type
 
+    const decodedJWT = verifyJWT(jwt);
+
     const teamExists = await TeamModel.exists({
       name: teamName.toLowerCase(),
     }).then();
@@ -42,9 +44,13 @@ export default class TeamService {
       });
     }
 
-    const decodedJWT = verifyJWT(jwt);
-
     const owner = await UserModel.findById(decodedJWT.id).then();
+
+    if (!owner) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
     Logger.debug({ owner });
 
     Logger.silly("Creating new team");
@@ -93,6 +99,11 @@ export default class TeamService {
         throw new InternalServerError();
       });
 
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
     Logger.silly("Getting team");
     const team = await TeamModel.findById(teamID);
     if (!team) {
@@ -130,6 +141,12 @@ export default class TeamService {
   ): Promise<ITeamModel> {
     Logger.verbose("Updating team details");
     const team = await this.getTeam(jwt, teamID);
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
     Logger.debug({ oldTeam: team, newDetails });
 
     if (newDetails.name) {
@@ -198,9 +215,24 @@ export default class TeamService {
         throw err;
       });
 
+    if (!oldOwner) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!newOwner) {
+      Logger.verbose("New owner not found");
+      throw new NotFoundError({ errorCode: "error_invalid_new_owner" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
     Logger.debug({ team, oldOwner, newOwner });
 
-    if (!decodedJWT.isAdmin) {
+    if (!oldOwner.isAdmin) {
       if (!team.inTeam(newOwner)) {
         Logger.verbose("New owner not in team");
         throw new BadRequestError({
@@ -264,6 +296,16 @@ export default class TeamService {
         throw err;
       });
 
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
     Logger.debug({ user, team });
 
     if (!user.isAdmin) {
@@ -317,6 +359,11 @@ export default class TeamService {
   ): Promise<ITeamInviteModel | BasicInvite> {
     Logger.verbose("Fetching invite");
     const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
+
+    if (!invite) {
+      Logger.verbose("Invite not found");
+      throw new NotFoundError({ errorCode: "error_invite_not_found" });
+    }
 
     let user: IUserModel;
     if (jwt) {
@@ -372,11 +419,20 @@ export default class TeamService {
         throw err;
       });
 
-    Logger.debug({ user, invite });
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
 
     if (!invite) {
-      throw new NotFoundError({ errorMessage: "Invite not found", errorCode: "error_invalid_invite" });
+      Logger.verbose("Invite not found");
+      throw new NotFoundError({
+        errorMessage: "Invite not found",
+        errorCode: "error_invalid_invite",
+      });
     }
+
+    Logger.debug({ user, invite });
 
     const team = invite.team;
 
@@ -421,9 +477,17 @@ export default class TeamService {
 
     Logger.debug({ user, invite });
 
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
     if (!invite) {
-      Logger.verbose("Invite doesn't exist");
-      throw new NotFoundError({ errorMessage: "Invite not found", errorCode: "error_invalid_invite" });
+      Logger.verbose("Invite not found");
+      throw new NotFoundError({
+        errorMessage: "Invite not found",
+        errorCode: "error_invalid_invite",
+      });
     }
 
     const team = invite.team;
@@ -469,12 +533,17 @@ export default class TeamService {
         throw err;
       });
 
-    Logger.debug({ user, team });
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
 
     if (!team) {
       Logger.silly("Team doesn't exist");
       throw new NotFoundError({ errorCode: "error_team_not_found" });
     }
+
+    Logger.debug({ user, team });
 
     if (team.isOwner(user)) {
       Logger.verbose("Owner of team cannot leave");
@@ -529,6 +598,16 @@ export default class TeamService {
         throw err;
       });
     Logger.debug({ user, team });
+
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
 
     if (!user.isAdmin) {
       if (!team.isOwner(user)) {
