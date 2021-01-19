@@ -5,6 +5,7 @@ import Logger from "../../loaders/logger";
 import AuthService from "../../services/Auth";
 import { notImplemented } from "../../util";
 import { refreshToken as joiRefreshToken } from "../../util/celebrate";
+import { authRateLimit } from "../../util/rateLimits";
 
 const authService = new AuthService();
 
@@ -35,9 +36,14 @@ export default (): Router => {
 
   router
     .route("/register")
+    .all(authRateLimit)
     .post(newUserVerification, register)
     .all(notImplemented);
-  router.route("/login").post(verifyLoginCreds, login).all(notImplemented);
+  router
+    .route("/login")
+    .all(authRateLimit)
+    .post(verifyLoginCreds, login)
+    .all(notImplemented);
   router
     .route("/logout")
     .post(

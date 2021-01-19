@@ -87,6 +87,23 @@ const config = convict({
     default: 10,
     env: "SALT_ROUNDS",
   },
+  rateLimit: {
+    auth: {
+      windowMs: {
+        doc: "Timeframe for which requests are checked/remembered (in ms)",
+        format: Number,
+        default: 1 * 60 * 1000, // 1 minute
+        env: "RATELIMIT_AUTH_FRAME",
+      },
+      max: {
+        doc:
+          "Max number of connections during windowMs before sending a 429 response",
+        format: Number,
+        default: 10,
+        env: "RATELIMIT_AUTH_MAX",
+      },
+    },
+  },
 });
 
 if (config.get("env") === "production") {
