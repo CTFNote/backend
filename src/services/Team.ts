@@ -90,10 +90,18 @@ export default class TeamService {
     Logger.verbose("Getting team");
     const decodedJWT = verifyJWT(jwt);
 
-    Logger.silly("Getting user");
-    const user = await (await UserModel.findById(decodedJWT.id))
-      .execPopulate()
-      .then()
+    let team: ITeamModel;
+    let user: IUserModel;
+
+    Logger.silly("Getting user and team");
+    await Promise.all([
+      TeamModel.findById(teamID),
+      UserModel.findById(decodedJWT.id),
+    ])
+      .then((results) => {
+        team = results[0];
+        user = results[1];
+      })
       .catch((err) => {
         Logger.error(err);
         throw new InternalServerError();
@@ -104,8 +112,6 @@ export default class TeamService {
       throw new NotFoundError({ errorCode: "error_user_not_found" });
     }
 
-    Logger.silly("Getting team");
-    const team = await TeamModel.findById(teamID);
     if (!team) {
       throw new NotFoundError({ errorCode: "error_team_not_found" });
     }
