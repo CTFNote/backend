@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.1](https://github.com/CTFNote/backend/compare/v0.1.0-alpha.0...v0.1.0-alpha.1) (2021-01-20)
+
+
+### Features
+
+* add more checks ([4d82dcd](https://github.com/CTFNote/backend/commit/4d82dcd72f136407031ffc09d6c3b2b5da3ff043))
+* add ratelimiting for auth paths ([fddb7ea](https://github.com/CTFNote/backend/commit/fddb7ea3bff013383e08bb5e7e595a8c670b29c6))
+
+
+### Bug Fixes
+
+* **deps:** update dependency mongoose to v5.11.12 ([c502302](https://github.com/CTFNote/backend/commit/c502302d8d3f19119b93cec16cb4efa4cbbe4000))
+
+
+### Chore
+
+* **deps:** update dependency eslint to v7.18.0 ([2abfc9d](https://github.com/CTFNote/backend/commit/2abfc9db3a87e3e14f623902889ba1bbb7538ba1))
+* **deps:** update dependency husky to v4.3.8 ([be0931f](https://github.com/CTFNote/backend/commit/be0931f7b9d08abe0b48512d2b34d0e40fc7a9fd))
+* **deps:** update typescript-eslint monorepo to v4.14.0 ([d847f98](https://github.com/CTFNote/backend/commit/d847f98868451e642fc746df7f055769f0843cd5))
+
 ## [0.1.0-alpha.0](https://github.com/CTFNote/backend/compare/v0.1.0-alpha...v0.1.0-alpha.0) (2021-01-15)
 
 
