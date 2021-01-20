@@ -1,8 +1,8 @@
 import { Types as mongooseTypes } from "mongoose";
 
 export interface TeamSocials {
-  twitter: string;
-  website: string;
+  twitter?: string;
+  website?: string;
 }
 
 // The params an error errorMessage can take
@@ -55,13 +55,13 @@ export interface JWTData {
 }
 
 export interface TeamDetailsUpdateData {
-  name: string;
-  socials: TeamSocials;
+  name?: string;
+  socials?: TeamSocials;
 }
 
 export interface InviteOptions {
-  maxUses: number;
-  expiry: Date;
+  maxUses?: number;
+  expiry?: Date;
 }
 
 export interface BasicInvite {
