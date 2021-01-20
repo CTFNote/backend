@@ -1,6 +1,6 @@
 import { UserModel } from "../models/User";
 import { BasicUserDetails, UserDetailsUpdateData } from "../types";
-import { BadRequestError, ForbiddenError } from "../types/httperrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../types/httperrors";
 import { basicDetails, verifyJWT } from "../util";
 import Logger from "../loaders/logger";
 
@@ -20,6 +20,10 @@ export default class UserService {
     const decodedJWT = verifyJWT(jwt);
 
     const user = await UserModel.findById(decodedJWT.id).then();
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
     Logger.debug(user);
 
     if (userDetails.username) {
