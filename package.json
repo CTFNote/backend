@@ -1,6 +1,6 @@
 {
   "name": "ctfnote-backend",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": " The backend for CTFNote, made using Node.js, express.js, and Typescript.",
   "main": "src/app.ts",
   "repository": "git@github.com:CTFNote/backend",
@@ -31,7 +31,7 @@
     "express": "4.17.1",
     "express-rate-limit": "5.2.3",
     "jsonwebtoken": "8.5.1",
-    "mongoose": "5.11.12",
+    "mongoose": "5.11.13",
     "morgan": "1.10.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.3",

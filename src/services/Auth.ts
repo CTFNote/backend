@@ -182,7 +182,7 @@ export default class AuthService {
    * @returns {Promise<IUserModel>} the whole document on the user
    * @memberof AuthService
    */
-  public async getFullUser(id: mongoose.Types.ObjectId): Promise<IUserModel> {
+  private async getFullUser(id: mongoose.Types.ObjectId): Promise<IUserModel> {
     Logger.silly("Checking for valid ObjectId");
     if (!isValidObjectId(id)) {
       throw new BadRequestError({ errorCode: "error_invalid_id" });
@@ -245,7 +245,7 @@ export default class AuthService {
    * @returns {string} the JWT
    * @memberof AuthService
    */
-  public generateAccessToken(user: IUserModel): string {
+  private generateAccessToken(user: IUserModel): string {
     const jwtData: JWTData = { sub: user._id, id: user._id };
 
     if (user.isAdmin) {
@@ -266,7 +266,7 @@ export default class AuthService {
    * @returns {Promise<IRefreshTokenModel>} the token document
    * @memberof AuthService
    */
-  public async getRefreshToken(token: string): Promise<IRefreshTokenModel> {
+  private async getRefreshToken(token: string): Promise<IRefreshTokenModel> {
     const refreshToken = await RefreshToken.findOne({ token }).then();
 
     if (!refreshToken || !refreshToken.isActive) {
@@ -285,7 +285,7 @@ export default class AuthService {
    * @param {string} ipAddress what ip address is generating the new refresh token
    * @memberof AuthService
    */
-  public generateRefreshToken(
+  private generateRefreshToken(
     user: IUserModel,
     ipAddress: string
   ): IRefreshTokenModel {
@@ -305,7 +305,7 @@ export default class AuthService {
    * @param {string} [replacedByToken] an optional parameter that indicates what token replaces this one
    * @memberof AuthService
    */
-  public async revokeToken(
+  private async revokeToken(
     token: string,
     ipAddress: string,
     replacedByToken?: string

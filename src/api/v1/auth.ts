@@ -42,7 +42,9 @@ export default (): Router => {
   router
     .route("/login")
     .all(authRateLimit)
-    .post(verifyLoginCreds, login)
+    // LGTM issue is disabled because i am actually using rate limiting, but for some reason LGTM
+    // isn't picking it up.
+    .post(verifyLoginCreds, login) // lgtm [js/missing-rate-limiting]
     .all(notImplemented);
   router
     .route("/logout")
