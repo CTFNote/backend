@@ -1,21 +1,22 @@
 import { model, Document, Schema } from "mongoose";
 
 import { TeamSocials } from "../types";
-import { ICTFSchema } from "./CTF";
-import { IUserModel } from "./User";
+import { ICTF } from "./CTF";
+import { ITeamInvite } from "./TeamInvite";
+import { IUser } from "./User";
 
-interface ITeamSchema {
+interface ITeam extends Document {
   name: string;
-  owner: IUserModel;
+  owner: IUser;
   socials: TeamSocials;
-  members: Array<IUserModel>;
-  CTFs: Array<ICTFSchema>;
-  invites: Array<ITeamSchema>;
-  isOwner(user: IUserModel): boolean;
-  inTeam(user: IUserModel): boolean;
+  members: Array<IUser>;
+  CTFs: Array<ICTF>;
+  invites: Array<ITeamInvite>;
+  isOwner(user: IUser): boolean;
+  inTeam(user: IUser): boolean;
 }
 
-const TeamSchema = new Schema<ITeamSchema>({
+const TeamSchema = new Schema<ITeam>({
   name: String,
   owner: { type: Schema.Types.ObjectId, ref: "User" },
   socials: Object,
@@ -24,16 +25,15 @@ const TeamSchema = new Schema<ITeamSchema>({
   invites: [{ type: Schema.Types.ObjectId, ref: "TeamInvite" }],
 });
 
-TeamSchema.methods.isOwner = function (user: IUserModel) {
+TeamSchema.methods.isOwner = function (user: IUser) {
   return this.owner.equals(user._id); // Compares the owner's ID to the passed in user's ID
 };
 
-TeamSchema.methods.inTeam = function (user: IUserModel) {
+TeamSchema.methods.inTeam = function (user: IUser) {
   return user._id in this.members || this.owner.equals(user._id);
 };
 
-interface ITeamModel extends ITeamSchema, Document {}
 
-const TeamModel = model<ITeamModel>("Team", TeamSchema);
+const TeamModel = model<ITeam>("Team", TeamSchema);
 
-export { TeamSchema, TeamModel, ITeamSchema, ITeamModel };
+export { TeamSchema, TeamModel, ITeam,  };
