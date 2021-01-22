@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/CTFNote/backend/compare/v0.1.0-alpha.1...v0.1.0) (2021-01-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* This probably breaks a lot of stuff, sorry :(
+
+### Features
+
+* check for missing SSL certs ([11058b5](https://github.com/CTFNote/backend/commit/11058b587af5103d92b7ccfff4cc78bbe8c0dc68))
+
+
+### Bug Fixes
+
+* disable automatic commit tagging ([50257dd](https://github.com/CTFNote/backend/commit/50257ddbbc02047e19d97fa6dc27f3dba6d37f50))
+* disable LGTM issue ([85faacb](https://github.com/CTFNote/backend/commit/85faacba52c9a30693918c2e4581886067c43488))
+* fix codeql scanning ([c6f877c](https://github.com/CTFNote/backend/commit/c6f877cd95d5a18d331b8bbe5643066d87a849b2)), closes [#31](https://github.com/CTFNote/backend/issues/31)
+* fix renovate schedule ([e5a015e](https://github.com/CTFNote/backend/commit/e5a015e911183e2d0d35262b80353e6d7d50a749)), closes [#35](https://github.com/CTFNote/backend/issues/35)
+* fix typing issues ([dca4ecb](https://github.com/CTFNote/backend/commit/dca4ecb67de05777c8b824755fbeba00b4871cc0))
+* **deps:** update dependency mongoose to v5.11.13 ([5eb1758](https://github.com/CTFNote/backend/commit/5eb1758775903ddba9b2d6b87ba5f862b418f2d9))
+* update typing to be correct ([7903d6d](https://github.com/CTFNote/backend/commit/7903d6dd24e2051ed20e52987102c58006e9ccbe))
+* use Promise.all where possible ([81a1019](https://github.com/CTFNote/backend/commit/81a1019cf878e2b9236109fd857c543415c3987c))
+
+
+### Refactor
+
+* make some methods private ([43629e2](https://github.com/CTFNote/backend/commit/43629e29a5f8368c06200061d6f58dae6532716a))
+
+
+### Chore
+
+* **release:** 0.1.0-alpha.2 ([8daa990](https://github.com/CTFNote/backend/commit/8daa990782ad617cf19a964b682f625b8e231241))
+* update renovate config ([87f9db8](https://github.com/CTFNote/backend/commit/87f9db8b2b16ea0e8003423ceca27a294173678e))
+* **deps:** pin dependencies ([f1e97ca](https://github.com/CTFNote/backend/commit/f1e97ca839a3843bd545a51682335ee37ed6c22d))
+* update renovate config ([7908137](https://github.com/CTFNote/backend/commit/790813791adfe27bf93dab26a3c591542e02ce78))
+
 ## [0.1.0-alpha.2](https://github.com/CTFNote/backend/compare/v0.1.0-alpha.1...v0.1.0-alpha.2) (2021-01-20)
 
 
