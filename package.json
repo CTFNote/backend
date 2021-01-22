@@ -12,11 +12,16 @@
     "build": "tsc",
     "dev": "cross-env NODE_ENV=development nodemon",
     "lint": "eslint src",
-    "release": "standard-version"
+    "release": "standard-version && echo \"REMEMBER TO TAG THE MERGE COMMIT\""
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "standard-version": {
+    "skip": {
+      "tag": true
     }
   },
   "dependencies": {
