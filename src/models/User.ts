@@ -1,16 +1,16 @@
 import { model, Document, Schema } from "mongoose";
 
-import { ITeamSchema } from "./Team";
+import { ITeam } from "./Team";
 
-interface IUserSchema {
+interface IUser extends Document {
   usernameCapitalization: string;
   username: string;
   password: string;
-  teams: Array<ITeamSchema>;
+  teams: Array<ITeam>;
   isAdmin: boolean;
 }
 
-const UserSchema = new Schema<IUserSchema>({
+const UserSchema = new Schema<IUser>({
   usernameCapitalization: String,
   username: String,
   password: String,
@@ -18,8 +18,6 @@ const UserSchema = new Schema<IUserSchema>({
   isAdmin: Boolean,
 });
 
-interface IUserModel extends IUserSchema, Document {}
+const UserModel = model<IUser>("User", UserSchema);
 
-const UserModel = model<IUserModel>("User", UserSchema);
-
-export { UserSchema, UserModel, IUserSchema, IUserModel };
+export { UserSchema, UserModel, IUser };

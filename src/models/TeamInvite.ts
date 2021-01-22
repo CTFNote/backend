@@ -1,19 +1,19 @@
 import { model, Document, Schema } from "mongoose";
 
-import { ITeamModel } from "./Team";
-import { IUserModel } from "./User";
+import { ITeam } from "./Team";
+import { IUser } from "./User";
 
-interface ITeamInviteSchema {
-  team: ITeamModel;
+interface ITeamInvite extends Document {
+  team: ITeam;
   inviteCode: string;
   expiry: Date;
   maxUses: number;
   createdAt: Date;
-  createdByUser: IUserModel;
-  uses: Array<IUserModel>;
+  createdByUser: IUser;
+  uses: Array<IUser>;
 }
 
-const TeamInviteSchema = new Schema<ITeamInviteSchema>({
+const TeamInviteSchema = new Schema<ITeamInvite>({
   team: { type: Schema.Types.ObjectId, ref: "Team" },
   inviteCode: String,
   expiry: Date,
@@ -23,13 +23,11 @@ const TeamInviteSchema = new Schema<ITeamInviteSchema>({
   uses: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
-interface ITeamInviteModel extends ITeamInviteSchema, Document {}
 
-const TeamInviteModel = model<ITeamInviteModel>("Invite", TeamInviteSchema);
+const TeamInviteModel = model<ITeamInvite>("Invite", TeamInviteSchema);
 
 export {
   TeamInviteSchema,
   TeamInviteModel,
-  ITeamInviteSchema,
-  ITeamInviteModel,
+  ITeamInvite,
 };

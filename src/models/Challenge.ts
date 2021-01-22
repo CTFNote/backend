@@ -1,23 +1,21 @@
 import { model, Document, Schema } from "mongoose";
 
-import { IUserSchema } from "./User";
+import { IUser } from "./User";
 
-interface IChallengeSchema {
+interface IChallenge extends Document {
   notepad: string;
   points: number;
   solved: boolean;
-  participants: Array<IUserSchema>;
+  participants: Array<IUser>;
 }
 
-const ChallengeSchema = new Schema<IChallengeSchema>({
+const ChallengeSchema = new Schema<IChallenge>({
   notepad: String,
   points: Number,
   solved: Boolean,
   participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
-interface IChallengeModel extends IChallengeSchema, Document {}
+const ChallengeModel = model<IChallenge>("Challenge", ChallengeSchema);
 
-const ChallengeModel = model<IChallengeModel>("Challenge", ChallengeSchema);
-
-export { ChallengeSchema, ChallengeModel, IChallengeSchema, IChallengeModel };
+export { ChallengeSchema, ChallengeModel, IChallenge };

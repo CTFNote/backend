@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 
-import { TeamModel, ITeamModel } from "../models/Team";
-import { IUserModel, UserModel } from "../models/User";
+import { TeamModel, ITeam } from "../models/Team";
+import { IUser, UserModel } from "../models/User";
 import {
   BadRequestError,
   ConflictError,
@@ -11,7 +11,7 @@ import {
 } from "../types/httperrors";
 import { BasicInvite, InviteOptions, TeamDetailsUpdateData } from "../types";
 import Logger from "../loaders/logger";
-import { ITeamInviteModel, TeamInviteModel } from "../models/TeamInvite";
+import { ITeamInvite, TeamInviteModel } from "../models/TeamInvite";
 import { basicInvite, verifyJWT } from "../util";
 
 export default class TeamService {
@@ -86,12 +86,12 @@ export default class TeamService {
    * @param {string} teamID the ID of the team that is getting fetched
    * @memberof TeamService
    */
-  public async getTeam(jwt: string, teamID: string): Promise<ITeamModel> {
+  public async getTeam(jwt: string, teamID: string): Promise<ITeam> {
     Logger.verbose("Getting team");
     const decodedJWT = verifyJWT(jwt);
 
-    let team: ITeamModel;
-    let user: IUserModel;
+    let team: ITeam;
+    let user: IUser;
 
     Logger.silly("Getting user and team");
     await Promise.all([
@@ -137,14 +137,14 @@ export default class TeamService {
    * @param {string} jwt the JWT of the user performing the operation
    * @param {string} teamID the id of the team being modified
    * @param {TeamDetailsUpdateData} newDetails the new team details
-   * @returns {Promise<ITeamModel>} the new team
+   * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateTeam(
     jwt: string,
     teamID: string,
     newDetails: TeamDetailsUpdateData
-  ): Promise<ITeamModel> {
+  ): Promise<ITeam> {
     Logger.verbose("Updating team details");
     const team = await this.getTeam(jwt, teamID);
 
@@ -185,20 +185,20 @@ export default class TeamService {
    * @param {string} jwt the JWT of the user performing the operation
    * @param {string} teamID the ID of the team being modified
    * @param {string} newOwnerID the ID of the new owner
-   * @returns {Promise<ITeamModel>} the new team
+   * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateOwner(
     jwt: string,
     teamID: string,
     newOwnerID: string
-  ): Promise<ITeamModel> {
+  ): Promise<ITeam> {
     Logger.silly("Updating team owner");
     const decodedJWT = verifyJWT(jwt);
 
-    let team: ITeamModel;
-    let oldOwner: IUserModel;
-    let newOwner: IUserModel;
+    let team: ITeam;
+    let oldOwner: IUser;
+    let newOwner: IUser;
 
     Logger.silly("Getting team, old owner, and new owner");
     await Promise.all([
@@ -276,20 +276,20 @@ export default class TeamService {
    * @param {string} jwt the JWT of the user performing the operation
    * @param {string} teamID the id of the team being modified
    * @param {InviteOptions} inviteOptions options for the invite
-   * @returns {Promise<ITeamInviteModel>} the invite created
+   * @returns {Promise<ITeamInvite>} the invite created
    * @memberof TeamService
    */
   public async createInvite(
     jwt: string,
     teamID: string,
     inviteOptions: InviteOptions
-  ): Promise<ITeamInviteModel> {
+  ): Promise<ITeamInvite> {
     Logger.verbose("Inviting user to team");
     const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUserModel;
-    let team: ITeamModel;
+    let user: IUser;
+    let team: ITeam;
     await Promise.all([
       UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
@@ -356,13 +356,13 @@ export default class TeamService {
    *
    * @param {(string | undefined)} jwt the JWT of the user performind the operation, if present
    * @param {string} inviteID the ID of the invite being requested
-   * @returns {(Promise<ITeamInviteModel | BasicInvite>)} return either a basic invite for normal users or a complete invite for admins
+   * @returns {(Promise<ITeamInvite | BasicInvite>)} return either a basic invite for normal users or a complete invite for admins
    * @memberof TeamService
    */
   public async getInvite(
     jwt: string | undefined,
     inviteID: string
-  ): Promise<ITeamInviteModel | BasicInvite> {
+  ): Promise<ITeamInvite | BasicInvite> {
     Logger.verbose("Fetching invite");
     const invite = await TeamInviteModel.findOne({ inviteCode: inviteID });
 
@@ -371,7 +371,7 @@ export default class TeamService {
       throw new NotFoundError({ errorCode: "error_invite_not_found" });
     }
 
-    let user: IUserModel;
+    let user: IUser;
     if (jwt) {
       const decodedJWT = verifyJWT(jwt);
 
@@ -458,16 +458,16 @@ export default class TeamService {
    *
    * @param {string} jwt the JWT of the user performing the operation. This is the user that will be added to the team
    * @param {string} inviteID the ID of the team in question
-   * @returns {Promise<ITeamModel>} the team the user was added to
+   * @returns {Promise<ITeam>} the team the user was added to
    * @memberof TeamService
    */
-  public async useInvite(jwt: string, inviteID: string): Promise<ITeamModel> {
+  public async useInvite(jwt: string, inviteID: string): Promise<ITeam> {
     Logger.verbose("Using invite and adding user to team");
     const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and invite");
-    let user: IUserModel;
-    let invite: ITeamInviteModel;
+    let user: IUser;
+    let invite: ITeamInvite;
 
     Promise.all([
       UserModel.findById(decodedJWT.id),
@@ -527,8 +527,8 @@ export default class TeamService {
     const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUserModel;
-    let team: ITeamModel;
+    let user: IUser;
+    let team: ITeam;
 
     Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
       .then((results) => {
@@ -592,8 +592,8 @@ export default class TeamService {
     const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUserModel;
-    let team: ITeamModel;
+    let user: IUser;
+    let team: ITeam;
 
     Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
       .then((results) => {

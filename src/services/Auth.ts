@@ -6,8 +6,8 @@ import { CookieOptions, Response } from "express";
 
 import config from "../config";
 import Logger from "../loaders/logger";
-import { IUserModel, UserModel } from "../models/User";
-import RefreshToken, { IRefreshTokenModel } from "../models/RefreshToken";
+import { IUser, UserModel } from "../models/User";
+import RefreshToken, { IRefreshToken } from "../models/RefreshToken";
 import {
   BadRequestError,
   ConflictError,
@@ -138,13 +138,13 @@ export default class AuthService {
    * generates the JWT and refresh tokens that will be returned to the user
    *
    * @private
-   * @param {IUserModel} user what user the tokens should be generated for
+   * @param {IUser} user what user the tokens should be generated for
    * @param {string} ipAddress what ip address is used to generate the tokens
    * @returns the jwt and refresh tokens
    * @memberof AuthService
    */
   private async generateTokens(
-    user: IUserModel,
+    user: IUser,
     ipAddress: string
   ): Promise<TokenData> {
     Logger.verbose("Generating tokens");
@@ -179,10 +179,10 @@ export default class AuthService {
    * gets all information on a user. this includes any and all sensitive information.
    *
    * @param {mongoose.Types.ObjectId} id the id of the user to find details on
-   * @returns {Promise<IUserModel>} the whole document on the user
+   * @returns {Promise<IUser>} the whole document on the user
    * @memberof AuthService
    */
-  private async getFullUser(id: mongoose.Types.ObjectId): Promise<IUserModel> {
+  private async getFullUser(id: mongoose.Types.ObjectId): Promise<IUser> {
     Logger.silly("Checking for valid ObjectId");
     if (!isValidObjectId(id)) {
       throw new BadRequestError({ errorCode: "error_invalid_id" });
@@ -241,11 +241,11 @@ export default class AuthService {
   /**
    * generates a JWT, aka the access token
    *
-   * @param {IUserModel} user what user the access token is for
+   * @param {IUser} user what user the access token is for
    * @returns {string} the JWT
    * @memberof AuthService
    */
-  private generateAccessToken(user: IUserModel): string {
+  private generateAccessToken(user: IUser): string {
     const jwtData: JWTData = { sub: user._id, id: user._id };
 
     if (user.isAdmin) {
@@ -263,10 +263,10 @@ export default class AuthService {
    * finds a refresh token from the database
    *
    * @param {string} token the token to find in the database
-   * @returns {Promise<IRefreshTokenModel>} the token document
+   * @returns {Promise<IRefreshToken>} the token document
    * @memberof AuthService
    */
-  private async getRefreshToken(token: string): Promise<IRefreshTokenModel> {
+  private async getRefreshToken(token: string): Promise<IRefreshToken> {
     const refreshToken = await RefreshToken.findOne({ token }).then();
 
     if (!refreshToken || !refreshToken.isActive) {
@@ -281,14 +281,14 @@ export default class AuthService {
   /**
    * generate a refresh token document without saving it in the database
    *
-   * @param {IUserModel} user what user the refresh token is for
+   * @param {IUser} user what user the refresh token is for
    * @param {string} ipAddress what ip address is generating the new refresh token
    * @memberof AuthService
    */
   private generateRefreshToken(
-    user: IUserModel,
+    user: IUser,
     ipAddress: string
-  ): IRefreshTokenModel {
+  ): IRefreshToken {
     return new RefreshToken({
       user: user.id,
       token: crypto.randomBytes(64).toString("hex"),

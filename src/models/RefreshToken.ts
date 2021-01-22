@@ -1,8 +1,8 @@
 import { Document, model, Schema } from "mongoose";
-import { IUserModel } from "./User";
+import { IUser } from "./User";
 
-interface IRefreshTokenSchema {
-  user: IUserModel;
+interface IRefreshToken extends Document {
+  user: IUser;
   token: string;
   expiresAt: Date;
   createdAt: Date;
@@ -16,7 +16,7 @@ interface IRefreshTokenSchema {
   isActive: boolean;
 }
 
-const RefreshTokenSchema = new Schema<IRefreshTokenSchema>({
+const RefreshTokenSchema = new Schema<IRefreshToken>({
   user: { type: Schema.Types.ObjectId, ref: "User" },
   token: String,
   expiresAt: Date,
@@ -33,8 +33,7 @@ RefreshTokenSchema.virtual("isExpired").get(function () {
 
 RefreshTokenSchema.virtual("isActive").get(function () {
   return (
-    !(this as IRefreshTokenSchema).revokedAt &&
-    !(this as IRefreshTokenSchema).isExpired
+    !(this as IRefreshToken).revokedAt && !(this as IRefreshToken).isExpired
   );
 });
 
@@ -48,18 +47,11 @@ RefreshTokenSchema.set("toJSON", {
   },
 });
 
-interface IRefreshTokenModel extends IRefreshTokenSchema, Document {}
-
-const RefreshTokenModel = model<IRefreshTokenModel>(
+const RefreshTokenModel = model<IRefreshToken>(
   "RefreshToken",
   RefreshTokenSchema
 );
 
 export default RefreshTokenModel;
 
-export {
-  RefreshTokenSchema,
-  RefreshTokenModel,
-  IRefreshTokenSchema,
-  IRefreshTokenModel,
-};
+export { RefreshTokenSchema, RefreshTokenModel, IRefreshToken };
