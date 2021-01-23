@@ -104,6 +104,20 @@ const config = convict({
       },
     },
   },
+  hedgeDoc: {
+    baseURL: {
+      doc: "The base URL to the HedgeDoc API.",
+      format: "url",
+      default: "localhost:8445",
+      env: "HEDGEDOC_API",
+    },
+    timeout: {
+      doc: "How long to wait before stopping API requests",
+      format: Number,
+      default: 5000,
+      env: "HEDGEDOC_TIMEOUT",
+    },
+  },
 });
 
 if (config.get("env") === "production") {
