@@ -15,7 +15,11 @@ export default (): Router => {
   const router = Router();
 
   router.route("/").patch(updateDetails).all(notImplemented);
-  router.route("/:userID?").get(verifyUserID, getDetails).all(notImplemented);
+  router
+    .route("/:userID?")
+    .get(verifyUserID, getDetails)
+    .get(verifyUserID, deleteUser)
+    .all(notImplemented);
 
   return router;
 };
@@ -53,6 +57,27 @@ async function getDetails(req: Request, res: Response, next: NextFunction) {
     .then((userData) => {
       Logger.silly("Sending user details");
       userData ? res.send(userData) : next(new NotFoundError());
+    })
+    .catch((err) => next(err));
+}
+
+async function deleteUser(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    throw new UnauthorizedError({
+      errorMessage: "Missing authorization",
+      errorCode: "error_unauthorized",
+    });
+  }
+
+  Logger.verbose("User has requested deletion");
+  Logger.debug({ ...req.body });
+  userService
+    .deleteUser(
+      req.headers.authorization.slice(7),
+      req.params.userID ? { user: req.params.userID } : undefined
+    )
+    .then(() => {
+      res.status(200).send();
     })
     .catch((err) => next(err));
 }
