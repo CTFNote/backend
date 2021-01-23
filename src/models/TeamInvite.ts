@@ -23,11 +23,6 @@ const TeamInviteSchema = new Schema<ITeamInvite>({
   uses: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
-
 const TeamInviteModel = model<ITeamInvite>("Invite", TeamInviteSchema);
 
-export {
-  TeamInviteSchema,
-  TeamInviteModel,
-  ITeamInvite,
-};
+export { TeamInviteSchema, TeamInviteModel, ITeamInvite };

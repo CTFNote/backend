@@ -28,7 +28,12 @@ const userService = new UserService();
 
 async function updateDetails(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ errorMessage: "Missing authorization", errorCode: "error_unauthorized" }));
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
   }
 
   Logger.verbose("Updating user details");
@@ -44,7 +49,12 @@ async function updateDetails(req: Request, res: Response, next: NextFunction) {
 
 async function getDetails(req: Request, res: Response, next: NextFunction) {
   if (!req.headers.authorization) {
-    next(new UnauthorizedError({ errorMessage: "Missing authorization", errorCode: "error_unauthorized" }));
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
   }
 
   Logger.verbose("Getting user details");

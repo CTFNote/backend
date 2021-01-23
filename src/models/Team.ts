@@ -33,7 +33,6 @@ TeamSchema.methods.inTeam = function (user: IUser) {
   return user._id in this.members || this.owner.equals(user._id);
 };
 
-
 const TeamModel = model<ITeam>("Team", TeamSchema);
 
-export { TeamSchema, TeamModel, ITeam,  };
+export { TeamSchema, TeamModel, ITeam };
