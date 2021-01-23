@@ -107,7 +107,7 @@ const config = convict({
   hedgeDoc: {
     baseURL: {
       doc: "The base URL to the HedgeDoc API.",
-      format: "url",
+      format: "*",
       default: "localhost:8445",
       env: "HEDGEDOC_API",
     },
