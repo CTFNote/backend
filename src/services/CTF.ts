@@ -1,7 +1,7 @@
 import axios from "axios";
-import config from "config";
-import Logger from "loaders/logger";
 
+import config from "../config";
+import Logger from "../loaders/logger";
 import { InternalServerError } from "../types/httperrors";
 
 export default class CTFService {
