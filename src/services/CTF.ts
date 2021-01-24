@@ -10,6 +10,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from "../types/httperrors";
+import { CTFOptions } from "../types";
 import { verifyJWT } from "../util";
 
 export default class CTFService {
@@ -42,10 +43,19 @@ export default class CTFService {
       });
   }
 
+  /**
+   * create a new CTF
+   *
+   * @param {string} jwt the JWT of the user performing the action
+   * @param {string} teamID the ID of the team
+   * @param {CTFOptions} options any options for the CTF
+   * @return {Promise<ICTF>} the CTF
+   * @memberof CTFService
+   */
   public async createCTF(
     jwt: string,
     teamID: string,
-    options: any
+    options: CTFOptions
   ): Promise<ICTF> {
     const decodedJWT = verifyJWT(jwt);
 
