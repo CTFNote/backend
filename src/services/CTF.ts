@@ -23,6 +23,7 @@ export default class CTFService {
       .post("/new", `${noteName}\n${"=".repeat(noteName.length)}`, {
         headers: { "Content-Type": "text/markdown" },
         maxRedirects: 0,
+        validateStatus: (status) => status >= 200 && status < 400, // Accept responses in the 200-399 range
       })
       .then((response) => {
         return response.headers.location;
