@@ -28,8 +28,8 @@ export default class CTFService {
       .then((response) => {
         return response.headers.location;
       })
-      .catch((error) => {
-        Logger.warn(error);
+      .catch((_) => {
+        Logger.warn("Request response code outside acceptable range.");
         throw new InternalServerError();
       });
   }
