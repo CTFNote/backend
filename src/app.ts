@@ -18,11 +18,14 @@ let httpsConfig: https.ServerOptions;
 
 if (config.get("httpsEnabled")) {
   try {
-  httpsConfig = {
-    key: readFileSync(resolve(__dirname, "ssl/key.pem")),
-    cert: readFileSync(resolve(__dirname, "ssl/cert.pem")),
-  };} catch (err) {
-    Logger.error("HTTPS is enabled, but certificates cannot be found. Disabling HTTPS.");
+    httpsConfig = {
+      key: readFileSync(resolve(__dirname, "ssl/key.pem")),
+      cert: readFileSync(resolve(__dirname, "ssl/cert.pem")),
+    };
+  } catch (err) {
+    Logger.error(
+      "HTTPS is enabled, but certificates cannot be found. Disabling HTTPS."
+    );
     config.set("httpsEnabled", false);
   }
 }

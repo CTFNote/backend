@@ -47,7 +47,10 @@ export default class AuthService {
 
     if (userAlreadyExists) {
       Logger.debug("Username taken; User exists");
-      throw new ConflictError({ errorMessage: "This username is already taken", errorCode: "error_user_exists" });
+      throw new ConflictError({
+        errorMessage: "This username is already taken",
+        errorCode: "error_user_exists",
+      });
     }
 
     return bcrypt
@@ -214,7 +217,9 @@ export default class AuthService {
   ): Promise<AuthenticatedUserData> {
     Logger.verbose("Regenerating refreshToken");
 
-    const refreshToken = await (await this.getRefreshToken(token)).populate("User").execPopulate();
+    const refreshToken = await (await this.getRefreshToken(token))
+      .populate("User")
+      .execPopulate();
     const user = await this.getFullUser(refreshToken.user._id);
     Logger.debug({ refreshToken, user });
 
@@ -285,10 +290,7 @@ export default class AuthService {
    * @param {string} ipAddress what ip address is generating the new refresh token
    * @memberof AuthService
    */
-  private generateRefreshToken(
-    user: IUser,
-    ipAddress: string
-  ): IRefreshToken {
+  private generateRefreshToken(user: IUser, ipAddress: string): IRefreshToken {
     return new RefreshToken({
       user: user.id,
       token: crypto.randomBytes(64).toString("hex"),
