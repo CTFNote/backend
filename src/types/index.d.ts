@@ -69,3 +69,8 @@ export interface BasicInvite {
   inviteCode: string;
   createdByUser: mongooseTypes.ObjectId | string;
 }
+
+export interface CTFOptions {
+  // Name of the CTF
+  name: string;
+}

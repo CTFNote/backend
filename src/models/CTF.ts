@@ -1,18 +1,23 @@
 import { model, Document, Schema } from "mongoose";
 
 import { IChallenge } from "./Challenge";
-import { IUser } from "./User";
+import { ITeam } from "./Team";
+// import { IUser } from "./User";
 
 interface ICTF extends Document {
   notepad: string;
   challenges: Array<IChallenge>;
-  participants: Array<IUser>;
+  team: ITeam
+  archived: boolean;
+  // participants: Array<IUser>;
 }
 
 const CTFSchema = new Schema<ICTF>({
   notepad: String,
   challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
-  participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  team: { type: Schema.Types.ObjectId, ref: "Team" },
+  archived: Boolean
+  // participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const CTFModel = model<ICTF>("CTF", CTFSchema);

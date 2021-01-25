@@ -11,6 +11,7 @@ import {
   verifyAuthHeader,
   verifyTeamID,
 } from "../../util/celebrate";
+import ctf from "./ctf";
 
 const verifyTeamCreation = celebrate({
   [Segments.BODY]: Joi.object({
@@ -52,6 +53,8 @@ export default (): Router => {
     .all();
 
   router.use("/:teamID", authAndTeam);
+
+  router.use("/:teamID/ctfs", ctf());
 
   router
     .route("/:teamID")
