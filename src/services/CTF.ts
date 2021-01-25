@@ -114,4 +114,47 @@ export default class CTFService {
 
     return ctf;
   }
+
+  public async listCTFs(jwt: string, teamID: string): Promise<Array<ICTF>> {
+    const decodedJWT = verifyJWT(jwt);
+
+    let user: IUser;
+    let team: ITeam;
+
+    Logger.silly("Getting user and team");
+    await Promise.all([
+      UserModel.findById(decodedJWT.id),
+      TeamModel.findById(teamID),
+    ])
+      .then(async (results) => {
+        user = await results[0].populate("teams").execPopulate();
+        team = await results[1].populate("CTFs").execPopulate();
+      })
+      .catch((err) => {
+        Logger.verbose(err);
+        throw new InternalServerError();
+      });
+
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
+    if (
+      !(team.members.includes(user.id) || team.isOwner(user)) &&
+      !user.isAdmin
+    ) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    return team.CTFs;
+  }
 }
