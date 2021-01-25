@@ -157,4 +157,66 @@ export default class CTFService {
 
     return team.CTFs;
   }
+
+  public async getCTF(
+    jwt: string,
+    teamID: string,
+    ctfID: string
+  ): Promise<ICTF> {
+    const decodedJWT = verifyJWT(jwt);
+
+    let user: IUser;
+    let team: ITeam;
+    let ctf: ICTF;
+
+    Logger.silly("Getting user, team, and CTF");
+    await Promise.all([
+      UserModel.findById(decodedJWT.id),
+      TeamModel.findById(teamID),
+      CTFModel.findById(ctfID),
+    ])
+      .then(async (results) => {
+        user = await results[0].populate("teams").execPopulate();
+        team = await results[1].populate("CTFs").execPopulate();
+        ctf = results[2];
+      })
+      .catch((err) => {
+        Logger.verbose(err);
+        throw new InternalServerError();
+      });
+
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
+    if (!ctf) {
+      Logger.verbose("CTF not found");
+      throw new NotFoundError({ errorCode: "error_ctf_not_found" });
+    }
+
+    if (ctf.team !== team.id && !user.isAdmin) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    if (
+      !(team.members.includes(user.id) || team.isOwner(user)) &&
+      !user.isAdmin
+    ) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    return ctf;
+  }
 }

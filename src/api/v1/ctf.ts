@@ -9,6 +9,7 @@ export default (): Router => {
   const router = Router({ mergeParams: true });
 
   router.route("/").get(listCTFs).post(createCTF).all(notImplemented);
+  router.route("/:ctfID").get(getCTF).all(notImplemented);
 
   return router;
 };
@@ -50,6 +51,25 @@ function listCTFs(req: Request, res: Response, next: NextFunction) {
     .listCTFs(req.headers.authorization.slice(7), req.params.teamID)
     .then((CTFs) => {
       res.status(200).send(CTFs);
+    })
+    .catch((err) => next(err));
+}
+
+function getCTF(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
+  }
+
+  Logger.verbose(`Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`);
+  _CTFService
+    .getCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .then((CTF) => {
+      res.status(200).send(CTF);
     })
     .catch((err) => next(err));
 }
