@@ -123,7 +123,7 @@ export default class CTFService {
    * @return {Promise<Array<ICTF>>} an array of the CTFs
    * @memberof CTFService
    */
-  public async listCTFs(jwt: string, teamID: string): Promise<Array<ICTF>> {
+  public async listCTFs(jwt: string, teamID: string, includeArchived?: boolean): Promise<Array<ICTF>> {
     const decodedJWT = verifyJWT(jwt);
 
     let user: IUser;
@@ -161,6 +161,10 @@ export default class CTFService {
       throw new ForbiddenError({
         errorCode: "error_invalid_permissions",
       });
+    }
+
+    if (!includeArchived) {
+      team.CTFs.filter(ctf => !ctf.archived);
     }
 
     return team.CTFs;
@@ -233,6 +237,148 @@ export default class CTFService {
         errorCode: "error_invalid_permissions",
       });
     }
+
+    return ctf;
+  }
+
+  /**
+   * Archives a CTF
+   *
+   * @param {string} jwt the JWT of the user
+   * @param {string} teamID the ID of the team that the CTF belongs to
+   * @param {string} ctfID the CTF to archive
+   * @return {Promise<ICTF>} the CTF after archival
+   * @memberof CTFService
+   */
+  public async archiveCTF(jwt: string, teamID: string, ctfID: string): Promise<ICTF> {
+    const decodedJWT = verifyJWT(jwt);
+
+    let user: IUser;
+    let team: ITeam;
+    let ctf: ICTF;
+
+    Logger.silly("Getting user, team, and CTF");
+    await Promise.all([
+      UserModel.findById(decodedJWT.id),
+      TeamModel.findById(teamID),
+      CTFModel.findById(ctfID),
+    ])
+      .then(async (results) => {
+        user = await results[0].populate("teams").execPopulate();
+        team = await results[1].populate("CTFs").execPopulate();
+        ctf = results[2];
+      })
+      .catch((err) => {
+        Logger.verbose(err);
+        throw new InternalServerError();
+      });
+
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
+    if (!ctf) {
+      Logger.verbose("CTF not found");
+      throw new NotFoundError({ errorCode: "error_ctf_not_found" });
+    }
+
+    if (ctf.team !== team.id && !user.isAdmin) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    if (
+      !(team.members.includes(user.id) || team.isOwner(user)) &&
+      !user.isAdmin
+    ) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    ctf.archived = true;
+
+    await ctf.save();
+
+    return ctf;
+  }
+
+  /**
+   * Unrchives a CTF
+   *
+   * @param {string} jwt the JWT of the user
+   * @param {string} teamID the ID of the team that the CTF belongs to
+   * @param {string} ctfID the CTF to unarchive
+   * @return {Promise<ICTF>} the CTF after unarchival
+   * @memberof CTFService
+   */
+  public async unarchiveCTF(jwt: string, teamID: string, ctfID: string): Promise<ICTF> {
+    const decodedJWT = verifyJWT(jwt);
+
+    let user: IUser;
+    let team: ITeam;
+    let ctf: ICTF;
+
+    Logger.silly("Getting user, team, and CTF");
+    await Promise.all([
+      UserModel.findById(decodedJWT.id),
+      TeamModel.findById(teamID),
+      CTFModel.findById(ctfID),
+    ])
+      .then(async (results) => {
+        user = await results[0].populate("teams").execPopulate();
+        team = await results[1].populate("CTFs").execPopulate();
+        ctf = results[2];
+      })
+      .catch((err) => {
+        Logger.verbose(err);
+        throw new InternalServerError();
+      });
+
+    if (!user) {
+      Logger.verbose("User not found");
+      throw new NotFoundError({ errorCode: "error_user_not_found" });
+    }
+
+    if (!team) {
+      Logger.verbose("Team not found");
+      throw new NotFoundError({ errorCode: "error_team_not_found" });
+    }
+
+    if (!ctf) {
+      Logger.verbose("CTF not found");
+      throw new NotFoundError({ errorCode: "error_ctf_not_found" });
+    }
+
+    if (ctf.team !== team.id && !user.isAdmin) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    if (
+      !(team.members.includes(user.id) || team.isOwner(user)) &&
+      !user.isAdmin
+    ) {
+      Logger.verbose("Invalid permissions");
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+      });
+    }
+
+    ctf.archived = false;
+
+    await ctf.save();
 
     return ctf;
   }

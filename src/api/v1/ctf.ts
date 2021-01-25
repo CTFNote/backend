@@ -10,6 +10,8 @@ export default (): Router => {
 
   router.route("/").get(listCTFs).post(createCTF).all(notImplemented);
   router.route("/:ctfID").get(getCTF).all(notImplemented);
+  router.route("/:ctfID/archive").post(archiveCTF).all(notImplemented);
+  router.route("/:ctfID/unarchive").post(unarchiveCTF).all(notImplemented);
 
   return router;
 };
@@ -48,7 +50,7 @@ function listCTFs(req: Request, res: Response, next: NextFunction) {
 
   Logger.verbose(`Getting list of CTFs for team ${req.params.teamID}`);
   _CTFService
-    .listCTFs(req.headers.authorization.slice(7), req.params.teamID)
+    .listCTFs(req.headers.authorization.slice(7), req.params.teamID, req.body.includeArchived ?? undefined)
     .then((CTFs) => {
       res.status(200).send(CTFs);
     })
@@ -68,6 +70,45 @@ function getCTF(req: Request, res: Response, next: NextFunction) {
   Logger.verbose(`Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`);
   _CTFService
     .getCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .then((CTF) => {
+      res.status(200).send(CTF);
+    })
+    .catch((err) => next(err));
+}
+
+
+function archiveCTF(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
+  }
+
+  Logger.verbose(`Archiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
+  _CTFService
+    .archiveCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .then((CTF) => {
+      res.status(200).send(CTF);
+    })
+    .catch((err) => next(err));
+}
+
+function unarchiveCTF(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    next(
+      new UnauthorizedError({
+        errorMessage: "Missing authorization",
+        errorCode: "error_unauthorized",
+      })
+    );
+  }
+
+  Logger.verbose(`Unarchiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
+  _CTFService
+    .unarchiveCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })

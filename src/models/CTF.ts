@@ -8,13 +8,15 @@ interface ICTF extends Document {
   notepad: string;
   challenges: Array<IChallenge>;
   team: ITeam
+  archived: boolean;
   // participants: Array<IUser>;
 }
 
 const CTFSchema = new Schema<ICTF>({
   notepad: String,
   challenges: [{ type: Schema.Types.ObjectId, ref: "Challenge" }],
-  team: { type: Schema.Types.ObjectId, ref: "Team" }
+  team: { type: Schema.Types.ObjectId, ref: "Team" },
+  archived: Boolean
   // participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
