@@ -115,6 +115,14 @@ export default class CTFService {
     return ctf;
   }
 
+  /**
+   * list all CTFs for a team
+   *
+   * @param {string} jwt the user's JWT
+   * @param {string} teamID the ID of the team that the CTFs belong to
+   * @return {Promise<Array<ICTF>>} an array of the CTFs
+   * @memberof CTFService
+   */
   public async listCTFs(jwt: string, teamID: string): Promise<Array<ICTF>> {
     const decodedJWT = verifyJWT(jwt);
 
@@ -158,6 +166,15 @@ export default class CTFService {
     return team.CTFs;
   }
 
+  /**
+   * get a spesific CTF
+   *
+   * @param {string} jwt the user's JWT
+   * @param {string} teamID the ID of the team that the CTF belongs to
+   * @param {string} ctfID the CTF to find
+   * @return {Promise<ICTF>} the CTF it found
+   * @memberof CTFService
+   */
   public async getCTF(
     jwt: string,
     teamID: string,
