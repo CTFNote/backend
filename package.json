@@ -10,7 +10,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/app.js",
     "build": "tsc",
-    "dev": "cross-env NODE_ENV=development nodemon",
+    "dev": "cross-env NODE_ENV=development nodemon --exec 'ts-node --files' src/app.ts",
     "lint": "eslint src",
     "release": "standard-version && echo \"REMEMBER TO TAG THE MERGE COMMIT\""
   },
