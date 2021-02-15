@@ -3,32 +3,23 @@ import { BasicUserDetails, UserDetailsUpdateData } from "../types";
 import {
   BadRequestError,
   ForbiddenError,
-  NotFoundError,
 } from "../types/httperrors";
-import { basicDetails, verifyJWT } from "../util";
+import { basicDetails } from "../util";
 import Logger from "../loaders/logger";
 
 export default class UserService {
   /**
    * update user details (change username, update password, etc)
    *
-   * @param {string} jwt the JWT used for auth
+   * @param {IUser} user the user being updated
    * @param {UserDetailsUpdateData} userDetails the data to update
    * @memberof UserService
    */
   public async updateDetails(
-    jwt: string,
+    user: IUser,
     userDetails: UserDetailsUpdateData
   ): Promise<void> {
     Logger.verbose("Updating user details");
-    const decodedJWT = verifyJWT(jwt);
-
-    const user = await UserModel.findById(decodedJWT.id).then();
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
-    Logger.debug(user);
 
     if (userDetails.username) {
       Logger.silly("Updating username");
@@ -70,24 +61,17 @@ export default class UserService {
   /**
    * get user details
    *
-   * @param {string} jwt the JWT used for auth
+   * @param {IUser} user the user getting the details
    * @memberof UserService
    */
   public async getDetails(
-    jwt: string,
+    user: IUser,
     options?: { user: string }
   ): Promise<BasicUserDetails> {
     Logger.verbose("Getting user details");
-    /* eslint-disable-next-line */
-    const decodedJWT = verifyJWT(jwt);
-
-    let userID = decodedJWT.id;
 
     if (options?.user) {
-      if (decodedJWT.isAdmin) {
-        Logger.verbose("User is admin");
-        userID = options.user;
-      } else {
+      if (!user.isAdmin) {
         Logger.info(
           "User tried to access info on other user without admin perms"
         );
@@ -96,12 +80,13 @@ export default class UserService {
           errorCode: "error_forbidden",
         });
       }
-    }
+      const details = await UserModel.findById(options.user).then();
 
-    const user = await UserModel.findById(userID).then();
+      if (!details) {
+        return;
+      }
 
-    if (!user) {
-      return;
+      return basicDetails(details);
     }
 
     Logger.silly("Returning basic user details");
@@ -111,19 +96,15 @@ export default class UserService {
   /**
    * deletes a user from the DB and removes the user from all teams
    *
-   * @param {string} jwt the JWT of the user performing the request
+   * @param {IUser} user the user performing the request
    * @param {{ user: string }} [options] a user to delete. only works for admins
    * @return {Promise<void>} doesn't return anything
    * @memberof UserService
    */
   public async deleteUser(
-    jwt: string,
+    user: IUser,
     options?: { user: string }
   ): Promise<void> {
-    const decodedJWT = verifyJWT(jwt);
-
-    let user = await UserModel.findById(decodedJWT.id);
-
     let deleteUser: IUser;
 
     if (options?.user) {
@@ -156,8 +137,8 @@ export default class UserService {
 
       await deleteUser.save();
     } else {
-      for (const team of deleteUser.teams) {
-        if (team.isOwner(deleteUser)) {
+      for (const team of user.teams) {
+        if (team.isOwner(user)) {
           throw new BadRequestError({
             errorCode: "error_user_owner",
             errorMessage:
@@ -165,7 +146,7 @@ export default class UserService {
           });
         }
 
-        team.members.filter((user) => user.id !== deleteUser.id);
+        team.members.filter((_user) => _user.id !== user.id);
         team.save();
       }
 

@@ -12,25 +12,23 @@ import {
 import { BasicInvite, InviteOptions, TeamDetailsUpdateData } from "../types";
 import Logger from "../loaders/logger";
 import { ITeamInvite, TeamInviteModel } from "../models/TeamInvite";
-import { basicInvite, verifyJWT } from "../util";
+import { basicInvite } from "../util";
 
 export default class TeamService {
   /**
    * create a new team
    *
-   * @param {string} jwt the JWT of the user creating the team
+   * @param {IUser} owner the user creating the team
    * @param {string} teamName the name of the team
    * @returns {Promise<{ teamName: string; teamID: string }>} returns the team data
    * @memberof TeamService
    */
   public async createTeam(
-    jwt: string,
+    owner: IUser,
     teamName: string
   ): Promise<{ teamName: string; teamID: string }> {
     Logger.verbose("Creating new team");
     // TODO: Turn this into a proper type
-
-    const decodedJWT = verifyJWT(jwt);
 
     const teamExists = await TeamModel.exists({
       name: teamName.toLowerCase(),
@@ -42,13 +40,6 @@ export default class TeamService {
         errorMessage: "A team with this name already exists",
         errorCode: "error_team_exists",
       });
-    }
-
-    const owner = await UserModel.findById(decodedJWT.id).then();
-
-    if (!owner) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
     }
 
     Logger.debug({ owner });
@@ -82,35 +73,25 @@ export default class TeamService {
    * Get's a team's information. By default only allows to get info if the user is in the team, but admins can always get the team details
    *
    * @async
-   * @param {string} jwt the JWT of the user trying to get team details
+   * @param {IUser} user the user trying to get team details
    * @param {string} teamID the ID of the team that is getting fetched
    * @memberof TeamService
    */
-  public async getTeam(jwt: string, teamID: string): Promise<ITeam> {
+  public async getTeam(user: IUser, teamID: string): Promise<ITeam> {
     Logger.verbose("Getting team");
-    const decodedJWT = verifyJWT(jwt);
 
     let team: ITeam;
-    let user: IUser;
+    // let user: IUser;
 
-    Logger.silly("Getting user and team");
-    await Promise.all([
-      TeamModel.findById(teamID),
-      UserModel.findById(decodedJWT.id),
-    ])
+    Logger.silly("Getting team");
+    await Promise.all([TeamModel.findById(teamID)])
       .then((results) => {
         team = results[0];
-        user = results[1];
       })
       .catch((err) => {
         Logger.error(err);
         throw new InternalServerError();
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       throw new NotFoundError({ errorCode: "error_team_not_found" });
@@ -134,19 +115,19 @@ export default class TeamService {
   /**
    * update team details
    *
-   * @param {string} jwt the JWT of the user performing the operation
+   * @param {IUser} user the user performing the operation
    * @param {string} teamID the id of the team being modified
    * @param {TeamDetailsUpdateData} newDetails the new team details
    * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateTeam(
-    jwt: string,
+    user: IUser,
     teamID: string,
     newDetails: TeamDetailsUpdateData
   ): Promise<ITeam> {
     Logger.verbose("Updating team details");
-    const team = await this.getTeam(jwt, teamID);
+    const team = await this.getTeam(user, teamID as any);
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -182,28 +163,24 @@ export default class TeamService {
   /**
    * change the team owner
    *
-   * @param {string} jwt the JWT of the user performing the operation
+   * @param {IUser} oldOwner the user performing the operation
    * @param {string} teamID the ID of the team being modified
    * @param {string} newOwnerID the ID of the new owner
    * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateOwner(
-    jwt: string,
+    oldOwner: IUser,
     teamID: string,
     newOwnerID: string
   ): Promise<ITeam> {
     Logger.silly("Updating team owner");
-    const decodedJWT = verifyJWT(jwt);
-
     let team: ITeam;
-    let oldOwner: IUser;
     let newOwner: IUser;
 
     Logger.silly("Getting team, old owner, and new owner");
     await Promise.all([
-      this.getTeam(jwt, teamID),
-      UserModel.findById(decodedJWT.id),
+      this.getTeam(oldOwner, teamID as any),
       UserModel.findById(newOwnerID),
     ])
       .then(async (results) => {
@@ -214,17 +191,11 @@ export default class TeamService {
           .populate("members")
           // .populate("CTFs")
           .execPopulate();
-        oldOwner = await results[1].populate("teams").execPopulate();
-        newOwner = await results[2].populate("teams").execPopulate();
+        newOwner = await results[1].populate("teams").execPopulate();
       })
       .catch((err) => {
         throw err;
       });
-
-    if (!oldOwner) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!newOwner) {
       Logger.verbose("New owner not found");
@@ -273,39 +244,28 @@ export default class TeamService {
   /**
    * create an invite to the team
    *
-   * @param {string} jwt the JWT of the user performing the operation
+   * @param {IUser} user the user performing the operation
    * @param {string} teamID the id of the team being modified
    * @param {InviteOptions} inviteOptions options for the invite
    * @returns {Promise<ITeamInvite>} the invite created
    * @memberof TeamService
    */
   public async createInvite(
-    jwt: string,
+    user: IUser,
     teamID: string,
     inviteOptions: InviteOptions
   ): Promise<ITeamInvite> {
     Logger.verbose("Inviting user to team");
-    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUser;
     let team: ITeam;
-    await Promise.all([
-      UserModel.findById(decodedJWT.id),
-      TeamModel.findById(teamID),
-    ])
+    await Promise.all([TeamModel.findById(teamID)])
       .then((results) => {
-        user = results[0];
         team = results[1];
       })
       .catch((err) => {
         throw err;
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -354,13 +314,13 @@ export default class TeamService {
   /**
    * gets an invite
    *
-   * @param {(string | undefined)} jwt the JWT of the user performind the operation, if present
+   * @param {IUser} user the user performing the operation, if present
    * @param {string} inviteID the ID of the invite being requested
    * @returns {(Promise<ITeamInvite | BasicInvite>)} return either a basic invite for normal users or a complete invite for admins
    * @memberof TeamService
    */
   public async getInvite(
-    jwt: string | undefined,
+    user: IUser,
     inviteID: string
   ): Promise<ITeamInvite | BasicInvite> {
     Logger.verbose("Fetching invite");
@@ -369,15 +329,6 @@ export default class TeamService {
     if (!invite) {
       Logger.verbose("Invite not found");
       throw new NotFoundError({ errorCode: "error_invite_not_found" });
-    }
-
-    let user: IUser;
-    if (jwt) {
-      const decodedJWT = verifyJWT(jwt);
-
-      user = await UserModel.findById(decodedJWT.id);
-    } else {
-      Logger.verbose("User is not authenticated");
     }
 
     if (!user?.isAdmin) {
@@ -400,35 +351,24 @@ export default class TeamService {
   /**
    * deletes an invite
    *
-   * @param {string} jwt the ID of the user performing the operation
+   * @param {IUser} user the user performing the operation
    * @param {string} inviteID the invite to delete's ID
    * @returns {Promise<void>} void
    * @memberof TeamService
    */
-  public async deleteInvite(jwt: string, inviteID: string): Promise<void> {
+  public async deleteInvite(user: IUser, inviteID: string): Promise<void> {
     Logger.verbose("Deleting invite");
-    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user;
     let invite;
 
-    Promise.all([
-      UserModel.findById(decodedJWT.id),
-      TeamInviteModel.findOne({ inviteCode: inviteID }),
-    ])
+    Promise.all([TeamInviteModel.findOne({ inviteCode: inviteID })])
       .then((results) => {
-        user = results[0];
-        invite = results[1];
+        invite = results[0];
       })
       .catch((err) => {
         throw err;
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!invite) {
       Logger.verbose("Invite not found");
@@ -456,37 +396,26 @@ export default class TeamService {
   /**
    * uses an invite and adds a user to the team
    *
-   * @param {string} jwt the JWT of the user performing the operation. This is the user that will be added to the team
+   * @param {IUser} user the user performing the operation. This is the user that will be added to the team
    * @param {string} inviteID the ID of the team in question
    * @returns {Promise<ITeam>} the team the user was added to
    * @memberof TeamService
    */
-  public async useInvite(jwt: string, inviteID: string): Promise<ITeam> {
+  public async useInvite(user: IUser, inviteID: string): Promise<ITeam> {
     Logger.verbose("Using invite and adding user to team");
-    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and invite");
-    let user: IUser;
     let invite: ITeamInvite;
 
-    Promise.all([
-      UserModel.findById(decodedJWT.id),
-      TeamInviteModel.findOne({ inviteCode: inviteID }),
-    ])
+    Promise.all([TeamInviteModel.findOne({ inviteCode: inviteID })])
       .then((results) => {
-        user = results[0];
-        invite = results[1];
+        invite = results[0];
       })
       .catch((err) => {
         throw err;
       });
 
-    Logger.debug({ user, invite });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
+    Logger.debug({ invite });
 
     if (!invite) {
       Logger.verbose("Invite not found");
@@ -517,32 +446,24 @@ export default class TeamService {
   /**
    * removes a user from a team
    *
-   * @param {string} jwt the JWT of the user to remove
+   * @param {IUser} user the the user to remove
    * @param {string} teamID the ID of the team
    * @returns {Promise<void>} void
    * @memberof TeamService
    */
-  public async leaveTeam(jwt: string, teamID: string): Promise<void> {
+  public async leaveTeam(user: IUser, teamID: string): Promise<void> {
     Logger.verbose("User is leaving team");
-    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUser;
     let team: ITeam;
 
-    Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
+    Promise.all([TeamModel.findById(teamID)])
       .then((results) => {
-        user = results[0];
-        team = results[1];
+        team = results[0];
       })
       .catch((err) => {
         throw err;
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.silly("Team doesn't exist");
@@ -582,33 +503,25 @@ export default class TeamService {
   /**
    * deletes a team. Only the team owner and admins can delete a team
    *
-   * @param {string} jwt the JWT of the user performing the operation
+   * @param {IUser} user the user performing the operation
    * @param {string} teamID the team to be deleted
    * @returns {Promise<void>} void
    * @memberof TeamService
    */
-  public async deleteTeam(jwt: string, teamID: string): Promise<void> {
+  public async deleteTeam(user: IUser, teamID: string): Promise<void> {
     Logger.verbose("Deleting team");
-    const decodedJWT = verifyJWT(jwt);
 
     Logger.silly("Getting user and team");
-    let user: IUser;
     let team: ITeam;
 
-    Promise.all([UserModel.findById(decodedJWT.id), TeamModel.findById(teamID)])
+    Promise.all([TeamModel.findById(teamID)])
       .then((results) => {
-        user = results[0];
         team = results[1];
       })
       .catch((err) => {
         throw err;
       });
     Logger.debug({ user, team });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");

@@ -3,7 +3,7 @@ import axios from "axios";
 import config from "../config";
 import Logger from "../loaders/logger";
 import { CTFModel, ICTF } from "../models/CTF";
-import { IUser, UserModel } from "../models/User";
+import { IUser } from "../models/User";
 import { ITeam, TeamModel } from "../models/Team";
 import {
   ForbiddenError,
@@ -11,7 +11,6 @@ import {
   NotFoundError,
 } from "../types/httperrors";
 import { CTFOptions } from "../types";
-import { verifyJWT } from "../util";
 
 export default class CTFService {
   private _hedgeDocAPI = axios.create({
@@ -46,40 +45,32 @@ export default class CTFService {
   /**
    * create a new CTF
    *
-   * @param {string} jwt the JWT of the user performing the action
+   * @param {IUser} user the user performing the action
    * @param {string} teamID the ID of the team
    * @param {CTFOptions} options any options for the CTF
    * @return {Promise<ICTF>} the CTF
    * @memberof CTFService
    */
   public async createCTF(
-    jwt: string,
+    user: IUser,
     teamID: string,
     options: CTFOptions
   ): Promise<ICTF> {
-    const decodedJWT = verifyJWT(jwt);
-
-    let user: IUser;
     let team: ITeam;
+
+    user = await user.populate("teams").execPopulate();
 
     Logger.silly("Getting user and team");
     await Promise.all([
-      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
     ])
       .then(async (results) => {
-        user = await results[0].populate("teams").execPopulate();
         team = results[1];
       })
       .catch((err) => {
         Logger.verbose(err);
         throw new InternalServerError();
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -118,37 +109,29 @@ export default class CTFService {
   /**
    * list all CTFs for a team
    *
-   * @param {string} jwt the user's JWT
+   * @param {IUser} user the user performing the action
    * @param {string} teamID the ID of the team that the CTFs belong to
    * @return {Promise<Array<ICTF>>} an array of the CTFs
    * @memberof CTFService
    */
-  public async listCTFs(jwt: string, teamID: string, includeArchived?: boolean): Promise<Array<ICTF>> {
-    const decodedJWT = verifyJWT(jwt);
+  public async listCTFs(user: IUser, teamID: string, includeArchived?: boolean): Promise<Array<ICTF>> {
+    user = await user.populate("teams").execPopulate();
 
-    let user: IUser;
     let team: ITeam;
 
     Logger.silly("Getting user and team");
     await Promise.all([
-      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
     ])
       .then(async (results) => {
-        user = await results[0].populate("teams").execPopulate();
-        team = await results[1].populate("CTFs").execPopulate();
+        team = await results[0].populate("CTFs").execPopulate();
       })
       .catch((err) => {
         Logger.verbose(err);
         throw new InternalServerError();
       });
 
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
-
-    if (!team) {
+      if (!team) {
       Logger.verbose("Team not found");
       throw new NotFoundError({ errorCode: "error_team_not_found" });
     }
@@ -173,43 +156,37 @@ export default class CTFService {
   /**
    * get a spesific CTF
    *
-   * @param {string} jwt the user's JWT
+   * @param {IUser} user the user performing the action
    * @param {string} teamID the ID of the team that the CTF belongs to
    * @param {string} ctfID the CTF to find
    * @return {Promise<ICTF>} the CTF it found
    * @memberof CTFService
    */
   public async getCTF(
-    jwt: string,
+    user: IUser,
     teamID: string,
     ctfID: string
   ): Promise<ICTF> {
-    const decodedJWT = verifyJWT(jwt);
 
-    let user: IUser;
+    user = await user.populate("teams").execPopulate();
+
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
     await Promise.all([
-      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
       CTFModel.findById(ctfID),
     ])
       .then(async (results) => {
-        user = await results[0].populate("teams").execPopulate();
-        team = await results[1].populate("CTFs").execPopulate();
-        ctf = results[2];
+        team = await results[0].populate("CTFs").execPopulate();
+        ctf = results[1];
       })
       .catch((err) => {
         Logger.verbose(err);
         throw new InternalServerError();
       });
 
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -244,39 +221,31 @@ export default class CTFService {
   /**
    * Archives a CTF
    *
-   * @param {string} jwt the JWT of the user
+   * @param {IUser} user the user performing the action
    * @param {string} teamID the ID of the team that the CTF belongs to
    * @param {string} ctfID the CTF to archive
    * @return {Promise<ICTF>} the CTF after archival
    * @memberof CTFService
    */
-  public async archiveCTF(jwt: string, teamID: string, ctfID: string): Promise<ICTF> {
-    const decodedJWT = verifyJWT(jwt);
+  public async archiveCTF(user: IUser, teamID: string, ctfID: string): Promise<ICTF> {
 
-    let user: IUser;
+    user = await user.populate("teams").execPopulate();
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
     await Promise.all([
-      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
       CTFModel.findById(ctfID),
     ])
       .then(async (results) => {
-        user = await results[0].populate("teams").execPopulate();
-        team = await results[1].populate("CTFs").execPopulate();
-        ctf = results[2];
+        team = await results[0].populate("CTFs").execPopulate();
+        ctf = results[1];
       })
       .catch((err) => {
         Logger.verbose(err);
         throw new InternalServerError();
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -315,39 +284,31 @@ export default class CTFService {
   /**
    * Unrchives a CTF
    *
-   * @param {string} jwt the JWT of the user
+   * @param {IUser} user the user performing the action
    * @param {string} teamID the ID of the team that the CTF belongs to
    * @param {string} ctfID the CTF to unarchive
    * @return {Promise<ICTF>} the CTF after unarchival
    * @memberof CTFService
    */
-  public async unarchiveCTF(jwt: string, teamID: string, ctfID: string): Promise<ICTF> {
-    const decodedJWT = verifyJWT(jwt);
+  public async unarchiveCTF(user: IUser, teamID: string, ctfID: string): Promise<ICTF> {
 
-    let user: IUser;
+    user = await user.populate("teams").execPopulate();
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
     await Promise.all([
-      UserModel.findById(decodedJWT.id),
       TeamModel.findById(teamID),
       CTFModel.findById(ctfID),
     ])
       .then(async (results) => {
-        user = await results[0].populate("teams").execPopulate();
-        team = await results[1].populate("CTFs").execPopulate();
-        ctf = results[2];
+        team = await results[0].populate("CTFs").execPopulate();
+        ctf = results[1];
       })
       .catch((err) => {
         Logger.verbose(err);
         throw new InternalServerError();
       });
-
-    if (!user) {
-      Logger.verbose("User not found");
-      throw new NotFoundError({ errorCode: "error_user_not_found" });
-    }
 
     if (!team) {
       Logger.verbose("Team not found");

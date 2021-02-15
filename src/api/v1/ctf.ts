@@ -2,11 +2,12 @@ import { NextFunction, Request, Response, Router } from "express";
 import Logger from "../../loaders/logger";
 
 import CTFService from "../../services/CTF";
-import { UnauthorizedError } from "../../types/httperrors";
 import { notImplemented } from "../../util";
+import attachUser from "../../util/middleware/user";
 
 export default (): Router => {
   const router = Router({ mergeParams: true });
+  router.use(attachUser());
 
   router.route("/").get(listCTFs).post(createCTF).all(notImplemented);
   router.route("/:ctfID").get(getCTF).all(notImplemented);
@@ -19,19 +20,10 @@ export default (): Router => {
 const _CTFService = new CTFService();
 
 function createCTF(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose(`Creating new CTF for team ${req.params.teamID}`);
   Logger.debug(JSON.stringify({ ...req.body }));
   _CTFService
-    .createCTF(req.headers.authorization.slice(7), req.params.teamID, req.body)
+    .createCTF(req.user, req.params.teamID, req.body)
     .then((ctfDetails) => {
       res.status(201).send(ctfDetails);
     })
@@ -39,18 +31,9 @@ function createCTF(req: Request, res: Response, next: NextFunction) {
 }
 
 function listCTFs(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose(`Getting list of CTFs for team ${req.params.teamID}`);
   _CTFService
-    .listCTFs(req.headers.authorization.slice(7), req.params.teamID, req.body.includeArchived ?? undefined)
+    .listCTFs(req.user, req.params.teamID, req.body.includeArchived ?? undefined)
     .then((CTFs) => {
       res.status(200).send(CTFs);
     })
@@ -58,18 +41,9 @@ function listCTFs(req: Request, res: Response, next: NextFunction) {
 }
 
 function getCTF(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose(`Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`);
   _CTFService
-    .getCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .getCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })
@@ -78,18 +52,9 @@ function getCTF(req: Request, res: Response, next: NextFunction) {
 
 
 function archiveCTF(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose(`Archiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
   _CTFService
-    .archiveCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .archiveCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })
@@ -97,18 +62,9 @@ function archiveCTF(req: Request, res: Response, next: NextFunction) {
 }
 
 function unarchiveCTF(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose(`Unarchiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
   _CTFService
-    .unarchiveCTF(req.headers.authorization.slice(7), req.params.teamID, req.params.ctfID)
+    .unarchiveCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })

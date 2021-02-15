@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
+import { CelebrateError, Joi, Segments } from "celebrate";
 
 import { NotFoundError, UnauthorizedError } from "../../types/httperrors";
 import { UserModel } from "../../models/User";
 import { verifyJWT } from "../index";
-import { Middleware } from "../../types";
+import { JWTData, Middleware } from "../../types";
+import { mongoDbObjectId } from "../celebrate";
 
 export default (options?: { userOptional?: boolean }): Middleware => {
   return async function (
@@ -20,7 +22,22 @@ export default (options?: { userOptional?: boolean }): Middleware => {
       );
     }
 
-    const decodedJWT = verifyJWT(req.headers.authorization.slice(7));
+    let decodedJWT: JWTData;
+    try {
+      decodedJWT = verifyJWT(req.headers.authorization.slice(7));
+    } catch (err) {
+      return next(err);
+    }
+
+    const validation = Joi.object({ userID: mongoDbObjectId }).validate({
+      userID: decodedJWT.id,
+    });
+
+    if (validation.error) {
+      const error = new CelebrateError(undefined, { celebrated: true });
+      error.details.set(Segments.PARAMS, validation.error);
+      return next(error);
+    }
 
     const user = await UserModel.findById(decodedJWT.id).then();
 

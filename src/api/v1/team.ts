@@ -3,14 +3,13 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import Logger from "../../loaders/logger";
 import TeamService from "../../services/Team";
-import { UnauthorizedError } from "../../types/httperrors";
 import { notImplemented } from "../../util";
 import {
   mongoDbObjectId,
   teamName,
-  verifyAuthHeader,
   verifyTeamID,
 } from "../../util/celebrate";
+import attachUser from "../../util/middleware/user";
 import ctf from "./ctf";
 
 const verifyTeamCreation = celebrate({
@@ -42,17 +41,16 @@ const verifyCreateInvite = celebrate({
   }),
 });
 
-const authAndTeam = [verifyAuthHeader, verifyTeamID];
-
 export default (): Router => {
   const router = Router();
+  router.use(attachUser());
 
   router
     .route("/")
-    .post(verifyAuthHeader, verifyTeamCreation, createTeam)
+    .post(verifyTeamCreation, createTeam)
     .all();
 
-  router.use("/:teamID", authAndTeam);
+  router.use("/:teamID", verifyTeamID);
 
   router.use("/:teamID/ctfs", ctf());
 
@@ -85,19 +83,10 @@ export default (): Router => {
 const teamService = new TeamService();
 
 function createTeam(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Creating new team");
   Logger.debug({ ...req.body });
   teamService
-    .createTeam(req.headers.authorization.slice(7), req.body.teamName)
+    .createTeam(req.user, req.body.teamName)
     .then((teamData) => {
       Logger.silly("Sending team data for new team");
       res.status(201).send(teamData);
@@ -106,19 +95,10 @@ function createTeam(req: Request, res: Response, next: NextFunction) {
 }
 
 function getTeam(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Getting information on a team");
   Logger.debug({ ...req.body });
   teamService
-    .getTeam(req.headers.authorization.slice(7), req.params.teamID)
+    .getTeam(req.user, req.params.teamID)
     .then((teamDetails) => {
       Logger.silly("Sending team data");
       res.send(teamDetails);
@@ -127,19 +107,10 @@ function getTeam(req: Request, res: Response, next: NextFunction) {
 }
 
 function updateTeam(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Updating team details");
   Logger.debug({ ...req.body });
   teamService
-    .updateTeam(req.headers.authorization.slice(7), req.params.teamID, req.body)
+    .updateTeam(req.user, req.params.teamID, req.body)
     .then((teamDetails) => {
       Logger.silly("Sending new team details");
       res.status(200).send(teamDetails);
@@ -148,23 +119,10 @@ function updateTeam(req: Request, res: Response, next: NextFunction) {
 }
 
 function updateOwner(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Changing team owner");
   Logger.debug({ ...req.body });
   teamService
-    .updateOwner(
-      req.headers.authorization.slice(7),
-      req.params.teamID,
-      req.body.newOwner
-    )
+    .updateOwner(req.user, req.params.teamID, req.body.newOwner)
     .then((teamDetails) => {
       Logger.silly("Sending new team details");
       res.send(teamDetails);
@@ -173,23 +131,10 @@ function updateOwner(req: Request, res: Response, next: NextFunction) {
 }
 
 function createInvite(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Creating new team invite");
   Logger.debug({ ...req.body, ...req.params });
   teamService
-    .createInvite(
-      req.headers.authorization.slice(7),
-      req.params.teamID,
-      req.body
-    )
+    .createInvite(req.user, req.params.teamID, req.body)
     .then((data) => {
       Logger.silly("Sending invite data");
       res.status(201).send(data);
@@ -198,19 +143,10 @@ function createInvite(req: Request, res: Response, next: NextFunction) {
 }
 
 function deleteInvite(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Deleting team invite");
   Logger.debug({ ...req.params });
   teamService
-    .deleteInvite(req.headers.authorization.slice(7), req.params.inviteID)
+    .deleteInvite(req.user, req.params.inviteID)
     .then(() => {
       Logger.silly("Sending status 204 for successful deletion");
       res.sendStatus(204);
@@ -219,19 +155,10 @@ function deleteInvite(req: Request, res: Response, next: NextFunction) {
 }
 
 function leaveTeam(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Leaving team");
   Logger.debug({ ...req.params });
   teamService
-    .leaveTeam(req.headers.authorization.slice(7), req.params.teamID)
+    .leaveTeam(req.user, req.params.teamID)
     .then(() => {
       Logger.silly("Sending status 204 for successful leave");
       res.sendStatus(204);
@@ -240,19 +167,10 @@ function leaveTeam(req: Request, res: Response, next: NextFunction) {
 }
 
 function deleteTeam(req: Request, res: Response, next: NextFunction) {
-  if (!req.headers.authorization) {
-    return next(
-      new UnauthorizedError({
-        errorMessage: "Missing authorization",
-        errorCode: "error_unauthorized",
-      })
-    );
-  }
-
   Logger.verbose("Deleting team");
   Logger.debug({ ...req.params });
   teamService
-    .deleteTeam(req.headers.authorization.slice(7), req.params.teamID)
+    .deleteTeam(req.user, req.params.teamID)
     .then(() => {
       Logger.silly("Sending status 204 for successful deletion");
       res.sendStatus(204);
