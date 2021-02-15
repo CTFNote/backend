@@ -1,9 +1,6 @@
 import { IUser, UserModel } from "../models/User";
 import { BasicUserDetails, UserDetailsUpdateData } from "../types";
-import {
-  BadRequestError,
-  ForbiddenError,
-} from "../types/httperrors";
+import { BadRequestError, ForbiddenError } from "../types/httperrors";
 import { basicDetails } from "../util";
 import Logger from "../loaders/logger";
 

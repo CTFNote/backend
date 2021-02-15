@@ -4,11 +4,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import Logger from "../../loaders/logger";
 import TeamService from "../../services/Team";
 import { notImplemented } from "../../util";
-import {
-  mongoDbObjectId,
-  teamName,
-  verifyTeamID,
-} from "../../util/celebrate";
+import { mongoDbObjectId, teamName, verifyTeamID } from "../../util/celebrate";
 import attachUser from "../../util/middleware/user";
 import ctf from "./ctf";
 
@@ -45,10 +41,7 @@ export default (): Router => {
   const router = Router();
   router.use(attachUser());
 
-  router
-    .route("/")
-    .post(verifyTeamCreation, createTeam)
-    .all();
+  router.route("/").post(verifyTeamCreation, createTeam).all();
 
   router.use("/:teamID", verifyTeamID);
 

@@ -33,7 +33,11 @@ function createCTF(req: Request, res: Response, next: NextFunction) {
 function listCTFs(req: Request, res: Response, next: NextFunction) {
   Logger.verbose(`Getting list of CTFs for team ${req.params.teamID}`);
   _CTFService
-    .listCTFs(req.user, req.params.teamID, req.body.includeArchived ?? undefined)
+    .listCTFs(
+      req.user,
+      req.params.teamID,
+      req.body.includeArchived ?? undefined
+    )
     .then((CTFs) => {
       res.status(200).send(CTFs);
     })
@@ -41,7 +45,9 @@ function listCTFs(req: Request, res: Response, next: NextFunction) {
 }
 
 function getCTF(req: Request, res: Response, next: NextFunction) {
-  Logger.verbose(`Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`);
+  Logger.verbose(
+    `Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`
+  );
   _CTFService
     .getCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {
@@ -50,9 +56,10 @@ function getCTF(req: Request, res: Response, next: NextFunction) {
     .catch((err) => next(err));
 }
 
-
 function archiveCTF(req: Request, res: Response, next: NextFunction) {
-  Logger.verbose(`Archiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
+  Logger.verbose(
+    `Archiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`
+  );
   _CTFService
     .archiveCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {
@@ -62,7 +69,9 @@ function archiveCTF(req: Request, res: Response, next: NextFunction) {
 }
 
 function unarchiveCTF(req: Request, res: Response, next: NextFunction) {
-  Logger.verbose(`Unarchiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`);
+  Logger.verbose(
+    `Unarchiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`
+  );
   _CTFService
     .unarchiveCTF(req.user, req.params.teamID, req.params.ctfID)
     .then((CTF) => {

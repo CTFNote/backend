@@ -61,9 +61,7 @@ export default class CTFService {
     user = await user.populate("teams").execPopulate();
 
     Logger.silly("Getting user and team");
-    await Promise.all([
-      TeamModel.findById(teamID),
-    ])
+    await Promise.all([TeamModel.findById(teamID)])
       .then(async (results) => {
         team = results[1];
       })
@@ -114,15 +112,17 @@ export default class CTFService {
    * @return {Promise<Array<ICTF>>} an array of the CTFs
    * @memberof CTFService
    */
-  public async listCTFs(user: IUser, teamID: string, includeArchived?: boolean): Promise<Array<ICTF>> {
+  public async listCTFs(
+    user: IUser,
+    teamID: string,
+    includeArchived?: boolean
+  ): Promise<Array<ICTF>> {
     user = await user.populate("teams").execPopulate();
 
     let team: ITeam;
 
     Logger.silly("Getting user and team");
-    await Promise.all([
-      TeamModel.findById(teamID),
-    ])
+    await Promise.all([TeamModel.findById(teamID)])
       .then(async (results) => {
         team = await results[0].populate("CTFs").execPopulate();
       })
@@ -131,7 +131,7 @@ export default class CTFService {
         throw new InternalServerError();
       });
 
-      if (!team) {
+    if (!team) {
       Logger.verbose("Team not found");
       throw new NotFoundError({ errorCode: "error_team_not_found" });
     }
@@ -147,7 +147,7 @@ export default class CTFService {
     }
 
     if (!includeArchived) {
-      team.CTFs.filter(ctf => !ctf.archived);
+      team.CTFs.filter((ctf) => !ctf.archived);
     }
 
     return team.CTFs;
@@ -167,17 +167,13 @@ export default class CTFService {
     teamID: string,
     ctfID: string
   ): Promise<ICTF> {
-
     user = await user.populate("teams").execPopulate();
 
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
-    await Promise.all([
-      TeamModel.findById(teamID),
-      CTFModel.findById(ctfID),
-    ])
+    await Promise.all([TeamModel.findById(teamID), CTFModel.findById(ctfID)])
       .then(async (results) => {
         team = await results[0].populate("CTFs").execPopulate();
         ctf = results[1];
@@ -186,7 +182,6 @@ export default class CTFService {
         Logger.verbose(err);
         throw new InternalServerError();
       });
-
 
     if (!team) {
       Logger.verbose("Team not found");
@@ -227,17 +222,17 @@ export default class CTFService {
    * @return {Promise<ICTF>} the CTF after archival
    * @memberof CTFService
    */
-  public async archiveCTF(user: IUser, teamID: string, ctfID: string): Promise<ICTF> {
-
+  public async archiveCTF(
+    user: IUser,
+    teamID: string,
+    ctfID: string
+  ): Promise<ICTF> {
     user = await user.populate("teams").execPopulate();
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
-    await Promise.all([
-      TeamModel.findById(teamID),
-      CTFModel.findById(ctfID),
-    ])
+    await Promise.all([TeamModel.findById(teamID), CTFModel.findById(ctfID)])
       .then(async (results) => {
         team = await results[0].populate("CTFs").execPopulate();
         ctf = results[1];
@@ -290,17 +285,17 @@ export default class CTFService {
    * @return {Promise<ICTF>} the CTF after unarchival
    * @memberof CTFService
    */
-  public async unarchiveCTF(user: IUser, teamID: string, ctfID: string): Promise<ICTF> {
-
+  public async unarchiveCTF(
+    user: IUser,
+    teamID: string,
+    ctfID: string
+  ): Promise<ICTF> {
     user = await user.populate("teams").execPopulate();
     let team: ITeam;
     let ctf: ICTF;
 
     Logger.silly("Getting user, team, and CTF");
-    await Promise.all([
-      TeamModel.findById(teamID),
-      CTFModel.findById(ctfID),
-    ])
+    await Promise.all([TeamModel.findById(teamID), CTFModel.findById(ctfID)])
       .then(async (results) => {
         team = await results[0].populate("CTFs").execPopulate();
         ctf = results[1];
