@@ -1,6 +1,6 @@
 {
   "name": "ctfnote-backend",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0",
   "description": " The backend for CTFNote, made using Node.js, express.js, and Typescript.",
   "main": "src/app.ts",
   "repository": "git@github.com:CTFNote/backend",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/app.js",
     "build": "tsc",
-    "dev": "cross-env NODE_ENV=development nodemon",
+    "dev": "cross-env NODE_ENV=development nodemon --exec 'ts-node --files' src/app.ts",
     "lint": "eslint src",
     "release": "standard-version && echo \"REMEMBER TO TAG THE MERGE COMMIT\""
   },
@@ -37,7 +37,7 @@
     "express": "4.17.1",
     "express-rate-limit": "5.2.3",
     "jsonwebtoken": "8.5.1",
-    "mongoose": "5.11.13",
+    "mongoose": "5.11.15",
     "morgan": "1.10.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.3",
@@ -57,9 +57,9 @@
     "@types/jsonwebtoken": "8.5.0",
     "@types/morgan": "1.9.2",
     "@types/nodemon": "1.19.0",
-    "@typescript-eslint/eslint-plugin": "4.14.0",
-    "@typescript-eslint/parser": "4.14.0",
-    "eslint": "7.18.0",
+    "@typescript-eslint/eslint-plugin": "4.15.0",
+    "@typescript-eslint/parser": "4.15.0",
+    "eslint": "7.19.0",
     "husky": "4.3.8",
     "nodemon": "2.0.7",
     "standard-version": "9.1.0"
