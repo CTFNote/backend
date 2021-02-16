@@ -4,7 +4,7 @@ import config from "../config";
 import Logger from "../loaders/logger";
 import { CTFModel, ICTF } from "../models/CTF";
 import { IUser } from "../models/User";
-import { ITeam, TeamModel } from "../models/Team";
+import { ITeam } from "../models/Team";
 import {
   ForbiddenError,
   InternalServerError,
