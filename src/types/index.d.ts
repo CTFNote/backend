@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import { Types as mongooseTypes } from "mongoose";
 
 export interface TeamSocials {
@@ -74,3 +75,5 @@ export interface CTFOptions {
   // Name of the CTF
   name: string;
 }
+
+export type Middleware = (req: Request, res: Response, next: NextFunction) => void | Promise<void>
