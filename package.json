@@ -1,6 +1,6 @@
 {
   "name": "ctfnote-backend",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0",
   "description": " The backend for CTFNote, made using Node.js, express.js, and Typescript.",
   "main": "src/app.ts",
   "repository": "git@github.com:CTFNote/backend",

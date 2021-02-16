@@ -2,6 +2,68 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/CTFNote/backend/compare/v0.1.0-alpha.3...v0.1.0) (2021-02-16)
+
+
+### Features
+
+* add config option for if the user is optional or not ([814194c](https://github.com/CTFNote/backend/commit/814194ce9d6ce03dac472a5b40db3805dcc5e018))
+* add initial user middleware ([f84b705](https://github.com/CTFNote/backend/commit/f84b7051d10909356c2a3491538d3045b2d55034))
+* add user middleware to all routes that need it ([69600d2](https://github.com/CTFNote/backend/commit/69600d245c079d9fc8b8a61ee5e801618306ef95))
+* create and add team middleware ([a827bd9](https://github.com/CTFNote/backend/commit/a827bd95988fdedec1ab5eb38c3221d372400c7f))
+* **api:** add CTF API router ([f1866c6](https://github.com/CTFNote/backend/commit/f1866c6b267430e1b03d1c49fd0fdd88541c24a0))
+* **ctf:** ability to list CTFs in team ([df1bfb1](https://github.com/CTFNote/backend/commit/df1bfb197c106ed89a9b9dd0d8bfae549174f1e2))
+* **ctf:** add ability to archive and unarchive CTFs ([be47738](https://github.com/CTFNote/backend/commit/be477388c10e329539f75bb8b7e7b8e4f13ba2e6))
+* **ctf:** get specific CTF ([0d54a67](https://github.com/CTFNote/backend/commit/0d54a6753d78c285a14aaee37949eb2f513ffafa))
+* ability to delete users ([eecee6c](https://github.com/CTFNote/backend/commit/eecee6c1fddcd19ced7ba0d3865b9a2b42aadb1e)), closes [#36](https://github.com/CTFNote/backend/issues/36)
+* config for hedgeDoc API ([e039408](https://github.com/CTFNote/backend/commit/e039408ea54a620e9f49ffed97f5416f06ee3352))
+* createCTF method in CTFService class ([e07b874](https://github.com/CTFNote/backend/commit/e07b874f010914f426ef03168e266cf6bd99f1e9))
+* initial CTF service ([30d2057](https://github.com/CTFNote/backend/commit/30d205744e62a10708e06678490d086a1ce2f9b2))
+
+
+### Bug Fixes
+
+* accept requests in the 200-399 range ([d75172a](https://github.com/CTFNote/backend/commit/d75172aa5e46572f74ef8217e48fcac089c45b41))
+* fix broken import ([03e0ce6](https://github.com/CTFNote/backend/commit/03e0ce616770860bdeb8ca59097b1f335b1358fe))
+* fix dev script to run with new types ([adc90d2](https://github.com/CTFNote/backend/commit/adc90d2291dc750ff9e4edcdba06811a9ee26c98))
+* fix unused import error (lgtm issue) ([be9175a](https://github.com/CTFNote/backend/commit/be9175a2436d4f59e1d40537d09895105682cb7b))
+* **config:** fix broken config format ([094ac66](https://github.com/CTFNote/backend/commit/094ac66a4d4e48a9ac5f78bba7c62e0b5d9002f8))
+* **deps:** update dependency mongoose to v5.11.15 ([f80c445](https://github.com/CTFNote/backend/commit/f80c445cd74fd3862fa210a8ad5b59f8f741dc9e))
+* **tsconfig:** remove baseUrl due to issues with compilation ([b8b4fee](https://github.com/CTFNote/backend/commit/b8b4feea0f01ec2d4ae2c5158f77bbca12b6999f))
+
+
+### Docs
+
+* write JSDocs for methods ([2b8351b](https://github.com/CTFNote/backend/commit/2b8351b888a0c05c9a8ca1927509eb60d8b7b8f5))
+
+
+### Style
+
+* formatting ([ac536d7](https://github.com/CTFNote/backend/commit/ac536d73711eca16a466e454c72be1c666bab0b8))
+* formatting ([291631e](https://github.com/CTFNote/backend/commit/291631ea15a9284836f02c575e3c12f333cc7d8f))
+
+
+### Chore
+
+* add .idea to gitignore ([376bc61](https://github.com/CTFNote/backend/commit/376bc615f67f721f9358a4d25cd3513f9d00bf31))
+* **ci:** create release script ([23a1fef](https://github.com/CTFNote/backend/commit/23a1fefe8f6017b1263e63ac90bf5d87da4c5230))
+* **config:** add sample config file ([015e7d2](https://github.com/CTFNote/backend/commit/015e7d28cc7841c04f032d38ef6ce9331d8d4a88))
+* **deps:** add axios to deps ([2ff3047](https://github.com/CTFNote/backend/commit/2ff3047ff3480879f9e97b6447897b8948a69613))
+* **deps:** pin axios to v0.21.1 ([56a09a4](https://github.com/CTFNote/backend/commit/56a09a4052f4f219b6db507c9c307a0e73583484))
+* **deps:** update @types/express to v4.17.11 ([f398b6d](https://github.com/CTFNote/backend/commit/f398b6d8532c761795fd2026e2e4e25cc7cdb3d0))
+* **deps:** update dependency eslint to v7.19.0 ([14470b1](https://github.com/CTFNote/backend/commit/14470b106e7ad3a0150f467e22be7969b8b2a9f6))
+* **deps:** update typescript-eslint monorepo to v4.15.0 ([63ba010](https://github.com/CTFNote/backend/commit/63ba010728a6edae7a579d5c4f40d9fcddfd268f))
+* **release:** 0.1.0-alpha.4 ([ce51c40](https://github.com/CTFNote/backend/commit/ce51c4043764ca8078ddac37f267567422e401a2))
+* **release:** update to correct release version ([5198223](https://github.com/CTFNote/backend/commit/51982230f3c1e7741209da971de18159d397e671))
+* **types:** add type and docs for CTF creation ([5176689](https://github.com/CTFNote/backend/commit/517668986557d06b1eab7e7aa93c60b66fb551b4))
+
+
+### Refactor
+
+* remove useless check ([9d62796](https://github.com/CTFNote/backend/commit/9d6279651120ba30ce4e74a420b2dcd3cfe24c78))
+* **logging:** add a better logging message ([f47b17c](https://github.com/CTFNote/backend/commit/f47b17c47b5fccc50910935628e487800a4151d4))
+* add team to CTF model and remove participants ([7e5fcde](https://github.com/CTFNote/backend/commit/7e5fcdeb246e01984102376a52fad5589013d619))
+
 ## [0.1.0-alpha.4](https://github.com/CTFNote/backend/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2021-01-25)
 
 
