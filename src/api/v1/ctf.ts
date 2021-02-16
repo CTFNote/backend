@@ -20,10 +20,10 @@ export default (): Router => {
 const _CTFService = new CTFService();
 
 function createCTF(req: Request, res: Response, next: NextFunction) {
-  Logger.verbose(`Creating new CTF for team ${req.params.teamID}`);
+  Logger.verbose(`Creating new CTF for team ${req.team._id}`);
   Logger.debug(JSON.stringify({ ...req.body }));
   _CTFService
-    .createCTF(req.user, req.params.teamID, req.body)
+    .createCTF(req.user, req.team, req.body)
     .then((ctfDetails) => {
       res.status(201).send(ctfDetails);
     })
@@ -31,11 +31,11 @@ function createCTF(req: Request, res: Response, next: NextFunction) {
 }
 
 function listCTFs(req: Request, res: Response, next: NextFunction) {
-  Logger.verbose(`Getting list of CTFs for team ${req.params.teamID}`);
+  Logger.verbose(`Getting list of CTFs for team ${req.team._id}`);
   _CTFService
     .listCTFs(
       req.user,
-      req.params.teamID,
+      req.team,
       req.body.includeArchived ?? undefined
     )
     .then((CTFs) => {
@@ -46,10 +46,10 @@ function listCTFs(req: Request, res: Response, next: NextFunction) {
 
 function getCTF(req: Request, res: Response, next: NextFunction) {
   Logger.verbose(
-    `Getting CTF with ID ${req.params.ctfID} from team ${req.params.teamID}`
+    `Getting CTF with ID ${req.params.ctfID} from team ${req.team._id}`
   );
   _CTFService
-    .getCTF(req.user, req.params.teamID, req.params.ctfID)
+    .getCTF(req.user, req.team, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })
@@ -58,10 +58,10 @@ function getCTF(req: Request, res: Response, next: NextFunction) {
 
 function archiveCTF(req: Request, res: Response, next: NextFunction) {
   Logger.verbose(
-    `Archiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`
+    `Archiving CTF with ID ${req.params.ctfID} in team ${req.team._id}`
   );
   _CTFService
-    .archiveCTF(req.user, req.params.teamID, req.params.ctfID)
+    .archiveCTF(req.user, req.team, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })
@@ -70,10 +70,10 @@ function archiveCTF(req: Request, res: Response, next: NextFunction) {
 
 function unarchiveCTF(req: Request, res: Response, next: NextFunction) {
   Logger.verbose(
-    `Unarchiving CTF with ID ${req.params.ctfID} in team ${req.params.teamID}`
+    `Unarchiving CTF with ID ${req.params.ctfID} in team ${req.team._id}`
   );
   _CTFService
-    .unarchiveCTF(req.user, req.params.teamID, req.params.ctfID)
+    .unarchiveCTF(req.user, req.team, req.params.ctfID)
     .then((CTF) => {
       res.status(200).send(CTF);
     })

@@ -74,30 +74,13 @@ export default class TeamService {
    *
    * @async
    * @param {IUser} user the user trying to get team details
-   * @param {string} teamID the ID of the team that is getting fetched
+   * @param {ITeam} team the team that is getting fetched
    * @memberof TeamService
    */
-  public async getTeam(user: IUser, teamID: string): Promise<ITeam> {
+  public async getTeam(user: IUser, team: ITeam): Promise<ITeam> {
     Logger.verbose("Getting team");
 
-    let team: ITeam;
-    // let user: IUser;
-
-    Logger.silly("Getting team");
-    await Promise.all([TeamModel.findById(teamID)])
-      .then((results) => {
-        team = results[0];
-      })
-      .catch((err) => {
-        Logger.error(err);
-        throw new InternalServerError();
-      });
-
-    if (!team) {
-      throw new NotFoundError({ errorCode: "error_team_not_found" });
-    }
-
-    Logger.debug({ user, team });
+    Logger.debug(JSON.stringify({ user, team }));
 
     if (!user.isAdmin) {
       if (!team.inTeam(user)) {
@@ -116,25 +99,20 @@ export default class TeamService {
    * update team details
    *
    * @param {IUser} user the user performing the operation
-   * @param {string} teamID the id of the team being modified
+   * @param {ITeam} team the team being modified
    * @param {TeamDetailsUpdateData} newDetails the new team details
    * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateTeam(
     user: IUser,
-    teamID: string,
+    _team: ITeam,
     newDetails: TeamDetailsUpdateData
   ): Promise<ITeam> {
     Logger.verbose("Updating team details");
-    const team = await this.getTeam(user, teamID as any);
+    const team = await this.getTeam(user, _team);
 
-    if (!team) {
-      Logger.verbose("Team not found");
-      throw new NotFoundError({ errorCode: "error_team_not_found" });
-    }
-
-    Logger.debug({ oldTeam: team, newDetails });
+    Logger.debug(JSON.stringify({ oldTeam: team, newDetails }));
 
     if (newDetails.name) {
       team.name = newDetails.name;
@@ -164,14 +142,14 @@ export default class TeamService {
    * change the team owner
    *
    * @param {IUser} oldOwner the user performing the operation
-   * @param {string} teamID the ID of the team being modified
+   * @param {ITeam} _team the ID of the team being modified
    * @param {string} newOwnerID the ID of the new owner
    * @returns {Promise<ITeam>} the new team
    * @memberof TeamService
    */
   public async updateOwner(
     oldOwner: IUser,
-    teamID: string,
+    _team: ITeam,
     newOwnerID: string
   ): Promise<ITeam> {
     Logger.silly("Updating team owner");
@@ -180,7 +158,7 @@ export default class TeamService {
 
     Logger.silly("Getting team, old owner, and new owner");
     await Promise.all([
-      this.getTeam(oldOwner, teamID as any),
+      this.getTeam(oldOwner, _team),
       UserModel.findById(newOwnerID),
     ])
       .then(async (results) => {
@@ -245,32 +223,17 @@ export default class TeamService {
    * create an invite to the team
    *
    * @param {IUser} user the user performing the operation
-   * @param {string} teamID the id of the team being modified
+   * @param {ITeam} team the id of the team being modified
    * @param {InviteOptions} inviteOptions options for the invite
    * @returns {Promise<ITeamInvite>} the invite created
    * @memberof TeamService
    */
   public async createInvite(
     user: IUser,
-    teamID: string,
+    team: ITeam,
     inviteOptions: InviteOptions
   ): Promise<ITeamInvite> {
     Logger.verbose("Inviting user to team");
-
-    Logger.silly("Getting user and team");
-    let team: ITeam;
-    await Promise.all([TeamModel.findById(teamID)])
-      .then((results) => {
-        team = results[1];
-      })
-      .catch((err) => {
-        throw err;
-      });
-
-    if (!team) {
-      Logger.verbose("Team not found");
-      throw new NotFoundError({ errorCode: "error_team_not_found" });
-    }
 
     Logger.debug({ user, team });
 
@@ -447,28 +410,12 @@ export default class TeamService {
    * removes a user from a team
    *
    * @param {IUser} user the the user to remove
-   * @param {string} teamID the ID of the team
+   * @param {ITeam} team the ID of the team
    * @returns {Promise<void>} void
    * @memberof TeamService
    */
-  public async leaveTeam(user: IUser, teamID: string): Promise<void> {
+  public async leaveTeam(user: IUser, team: ITeam): Promise<void> {
     Logger.verbose("User is leaving team");
-
-    Logger.silly("Getting user and team");
-    let team: ITeam;
-
-    Promise.all([TeamModel.findById(teamID)])
-      .then((results) => {
-        team = results[0];
-      })
-      .catch((err) => {
-        throw err;
-      });
-
-    if (!team) {
-      Logger.silly("Team doesn't exist");
-      throw new NotFoundError({ errorCode: "error_team_not_found" });
-    }
 
     Logger.debug({ user, team });
 
@@ -504,29 +451,12 @@ export default class TeamService {
    * deletes a team. Only the team owner and admins can delete a team
    *
    * @param {IUser} user the user performing the operation
-   * @param {string} teamID the team to be deleted
+   * @param {ITeam} team the team to be deleted
    * @returns {Promise<void>} void
    * @memberof TeamService
    */
-  public async deleteTeam(user: IUser, teamID: string): Promise<void> {
+  public async deleteTeam(user: IUser, team: ITeam): Promise<void> {
     Logger.verbose("Deleting team");
-
-    Logger.silly("Getting user and team");
-    let team: ITeam;
-
-    Promise.all([TeamModel.findById(teamID)])
-      .then((results) => {
-        team = results[1];
-      })
-      .catch((err) => {
-        throw err;
-      });
-    Logger.debug({ user, team });
-
-    if (!team) {
-      Logger.verbose("Team not found");
-      throw new NotFoundError({ errorCode: "error_team_not_found" });
-    }
 
     if (!user.isAdmin) {
       if (!team.isOwner(user)) {

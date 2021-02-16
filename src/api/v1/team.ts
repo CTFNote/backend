@@ -4,7 +4,8 @@ import { NextFunction, Request, Response, Router } from "express";
 import Logger from "../../loaders/logger";
 import TeamService from "../../services/Team";
 import { notImplemented } from "../../util";
-import { mongoDbObjectId, teamName, verifyTeamID } from "../../util/celebrate";
+import { mongoDbObjectId, teamName } from "../../util/celebrate";
+import attachTeam from "../../util/middleware/team";
 import attachUser from "../../util/middleware/user";
 import ctf from "./ctf";
 
@@ -43,7 +44,7 @@ export default (): Router => {
 
   router.route("/").post(verifyTeamCreation, createTeam).all();
 
-  router.use("/:teamID", verifyTeamID);
+  router.use("/:teamID", attachTeam());
 
   router.use("/:teamID/ctfs", ctf());
 
@@ -91,7 +92,7 @@ function getTeam(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Getting information on a team");
   Logger.debug({ ...req.body });
   teamService
-    .getTeam(req.user, req.params.teamID)
+    .getTeam(req.user, req.team)
     .then((teamDetails) => {
       Logger.silly("Sending team data");
       res.send(teamDetails);
@@ -103,7 +104,7 @@ function updateTeam(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Updating team details");
   Logger.debug({ ...req.body });
   teamService
-    .updateTeam(req.user, req.params.teamID, req.body)
+    .updateTeam(req.user, req.team, req.body)
     .then((teamDetails) => {
       Logger.silly("Sending new team details");
       res.status(200).send(teamDetails);
@@ -115,7 +116,7 @@ function updateOwner(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Changing team owner");
   Logger.debug({ ...req.body });
   teamService
-    .updateOwner(req.user, req.params.teamID, req.body.newOwner)
+    .updateOwner(req.user, req.team, req.body.newOwner)
     .then((teamDetails) => {
       Logger.silly("Sending new team details");
       res.send(teamDetails);
@@ -127,7 +128,7 @@ function createInvite(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Creating new team invite");
   Logger.debug({ ...req.body, ...req.params });
   teamService
-    .createInvite(req.user, req.params.teamID, req.body)
+    .createInvite(req.user, req.team, req.body)
     .then((data) => {
       Logger.silly("Sending invite data");
       res.status(201).send(data);
@@ -151,7 +152,7 @@ function leaveTeam(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Leaving team");
   Logger.debug({ ...req.params });
   teamService
-    .leaveTeam(req.user, req.params.teamID)
+    .leaveTeam(req.user, req.team)
     .then(() => {
       Logger.silly("Sending status 204 for successful leave");
       res.sendStatus(204);
@@ -163,7 +164,7 @@ function deleteTeam(req: Request, res: Response, next: NextFunction) {
   Logger.verbose("Deleting team");
   Logger.debug({ ...req.params });
   teamService
-    .deleteTeam(req.user, req.params.teamID)
+    .deleteTeam(req.user, req.team)
     .then(() => {
       Logger.silly("Sending status 204 for successful deletion");
       res.sendStatus(204);
