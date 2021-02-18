@@ -5,11 +5,13 @@ import CTFService from "../../services/CTF";
 import { notImplemented } from "../../util";
 import attachCTF from "../../util/middleware/ctf";
 import attachUser from "../../util/middleware/user";
+import challenge from "./challenge";
 
 export default (): Router => {
   const router = Router({ mergeParams: true });
 
   router.use(attachUser(), attachCTF());
+  router.use("/:ctfID/challenges", challenge());
 
   router.route("/").get(listCTFs).post(createCTF).all(notImplemented);
   router.route("/:ctfID").get(getCTF).all(notImplemented);

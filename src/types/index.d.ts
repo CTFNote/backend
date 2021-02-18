@@ -76,4 +76,12 @@ export interface CTFOptions {
   name: string;
 }
 
+export interface ChallengeOptions {
+  // Name of the challenge
+  name: string;
+
+  // How many points the challenge is worth
+  points: string;
+}
+
 export type Middleware = (req: Request, res: Response, next: NextFunction) => void | Promise<void>
