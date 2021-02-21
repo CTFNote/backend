@@ -8,6 +8,7 @@ import { ITeam } from "../models/Team";
 import { IUser } from "../models/User";
 import { ChallengeOptions } from "../types";
 import {
+  BadRequestError,
   ForbiddenError,
   InternalServerError,
   NotFoundError,
@@ -107,6 +108,44 @@ export default class Challenge {
     }
 
     return challenge;
+  }
+
+  /**
+   * Returns all challenges in a provided CTF
+   *
+   * @param {IUser} user the user performing the action
+   * @param {ITeam} team the team the ctf belongs to
+   * @param {ICTF} ctf the ctf to get all the challenges from
+   * @return {Promise<Array<IChallenge>>} An array of the challenges
+   * @memberof Challenge
+   */
+  public async getChallenges(
+    user: IUser,
+    team: ITeam,
+    ctf: ICTF
+  ): Promise<Array<IChallenge>> {
+    Logger.verbose(
+      `ChallengeService >>> Getting challenges from CTF with ID ${ctf._id}`
+    );
+
+    if (!team.inTeam(user) || !user.isAdmin) {
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+        errorMessage:
+          "Cannot get challenges from team where you are not a member.",
+        details:
+          "Only people who are in a team (or is an admin) can get challenges from CTFs of that team",
+      });
+    }
+
+    if (!team.CTFs.includes(ctf._id)) {
+      throw new BadRequestError({
+        errorCode: "error_ctf_not_in_team",
+        errorMessage: "This CTF is not in the provided team",
+      });
+    }
+
+    return ctf.challenges;
   }
 
   /**
