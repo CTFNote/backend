@@ -19,6 +19,16 @@ export default class Challenge {
     timeout: config.get("hedgeDoc.timeout"),
   });
 
+  /**
+   * Creates a new challenge in a CTF
+   *
+   * @param {IUser} user the user performing the action
+   * @param {ITeam} team the team the user is using
+   * @param {ICTF} ctf the CTF the challenge should be created on
+   * @param {ChallengeOptions} challengeOptions options for the challenge, like points value and name
+   * @return {Promise<IChallenge>} returns the challenge that was created
+   * @memberof Challenge
+   */
   public async createChallenge(
     user: IUser,
     team: ITeam,
@@ -57,6 +67,16 @@ export default class Challenge {
     return challenge;
   }
 
+  /**
+   * Gets a spesific challenge
+   *
+   * @param {IUser} user the user performing the action
+   * @param {ITeam} team the team the user is using
+   * @param {ICTF} ctf the CTF the challenge belongs on
+   * @param {string} challengeID the challenge to return
+   * @return {Promise<IChallenge>} the challenge itself
+   * @memberof Challenge
+   */
   public async getChallenge(
     user: IUser,
     team: ITeam,
@@ -96,7 +116,7 @@ export default class Challenge {
    * @param {string} noteName the title of the note
    * @param {string} pointsValue how many points the challenge is worth
    * @return {Promise<string>} returns the URL of the new note (including any leading slashes)
-   * @memberof CTFService
+   * @memberof Challenge
    */
   private async createNote(
     noteName: string,
