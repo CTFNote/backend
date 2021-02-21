@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
 import Challenge from "../../services/Challenge";
+import { notImplemented } from "../../util";
 
 export default (): Router => {
   const router = Router();
 
-  router.post("/", createChallenge);
-  router.get("/:challengeID", getChallenge);
+  router.route("/").post(createChallenge).all(notImplemented);
+  router.route("/:challengeID").get(getChallenge).all(notImplemented);
 
   return router;
 };
