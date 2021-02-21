@@ -7,7 +7,11 @@ import { ICTF } from "../models/CTF";
 import { ITeam } from "../models/Team";
 import { IUser } from "../models/User";
 import { ChallengeOptions } from "../types";
-import { ForbiddenError, InternalServerError } from "../types/httperrors";
+import {
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+} from "../types/httperrors";
 
 export default class Challenge {
   private _hedgeDocAPI = axios.create({
@@ -49,6 +53,38 @@ export default class Challenge {
 
     ctf.challenges.push(challenge);
     await ctf.save();
+
+    return challenge;
+  }
+
+  public async getChallenge(
+    user: IUser,
+    team: ITeam,
+    ctf: ICTF,
+    challengeID: string
+  ): Promise<IChallenge> {
+    Logger.verbose(
+      `ChallengeService >>> Getting challenge with ID ${challengeID} from CTF ${ctf._id}`
+    );
+
+    const challenge = await ChallengeModel.findById(challengeID).then();
+
+    if (!team.inTeam(user) || user.isAdmin) {
+      throw new ForbiddenError({
+        errorCode: "error_invalid_permissions",
+        errorMessage:
+          "Cannot get challenge from team where you are not a member.",
+        details:
+          "Only people who are in a team (or is an admin) can get challenges from CTFs of that team",
+      });
+    }
+
+    if (!ctf.challenges.includes(challenge._id)) {
+      throw new NotFoundError({
+        errorCode: "error_challenge_not_found",
+        errorMessage: "Challenge not found on specified CTF",
+      });
+    }
 
     return challenge;
   }
