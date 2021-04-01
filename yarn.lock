@@ -279,10 +279,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/convict@5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@types/convict/-/convict-5.2.2.tgz#f2eee6bc0da2d925abe3c949264d32be836e02b1"
-  integrity sha512-yz26pc2bwg8YyYz/X5s/MJsUy40n54vxDdQCRENtqGfKdrmpPqXdOV8LDuHqTA0acoFxybLsJ5hc9ZYK6amDCw==
+"@types/convict@6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@types/convict/-/convict-6.0.1.tgz#224832262e1e3b5a7cca5bcc88e550ca70b6b230"
+  integrity sha512-5094Bw9nSvkUNV7qqUvzDt6lgWZpKbpR/AJu8lmtojKa12nxtHHGrPFwK3YP4YZA1rCc2tbpI5TUEBU35eqVxg==
   dependencies:
     "@types/node" "*"
 
@@ -1196,10 +1196,10 @@ convict-format-with-validator@6.0.0:
   dependencies:
     validator "^11.1.0"
 
-convict@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/convict/-/convict-6.0.0.tgz#4be829f001a778d337d32ec79e9ae7f2e39df1a6"
-  integrity sha512-osfPkv5yjVoZqrTWBXuh/ABGpFoaJplbt0WXr0CodR4CSWt8UnzY4PSUyRz/+5BX5YUtWcToG29Kr0B6xhdIMg==
+convict@6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/convict/-/convict-6.0.1.tgz#d909a844d8a1187d1366d47d9bc21ec052e8bf0d"
+  integrity sha512-M4YNNq5NV4/VS8JhvBSHAokwvQRL4evEuU0VFe1GNPiqnj9TAkLXpf39ImCCVZlsp3CFp04bc/kRSWPGsJGJWg==
   dependencies:
     lodash.clonedeep "^4.5.0"
     yargs-parser "^18.1.3"
