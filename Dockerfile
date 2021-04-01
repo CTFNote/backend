@@ -1,6 +1,6 @@
 # Indicate that we want to use node 14.7.0 alpine.
 #? Alpine is simply a lighter image, although it is not as comprehensive as the normal image
-FROM node:14.15-alpine
+FROM node:14.16-alpine
 
 
 # Copy the package.json and yarn.lock files to the /tmp directory, in order to install dependencies
