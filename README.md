@@ -1,3 +1,5 @@
+## ⚠️ Development stopped, contact [@theS1LV3R](https://github.com/theS1LV3R) for organization name transfer or other questions ⚠️
+
 <!--markdownlint-disable first-line-heading ol-prefix -->
 
 <!-- PROJECT LOGO -->
